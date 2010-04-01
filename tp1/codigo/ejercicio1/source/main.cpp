@@ -12,26 +12,28 @@ int maxEditStepLadders(int palabraActual, int anteriorAgregada);
 /* var global donde estan las palabras */
 vector <string> palabras;
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc < 2){
+        cout << "debe ingresar el nombre del archivo";
+        return 1;
+    }
+
+    const char *archivo = argv[1];
+
     InputFile *a = new InputFile();
-    a->openFile("pepe.txt");
+    a->openFile(archivo);
 
-    vector <string > v = a->getFileContent();
+    palabras = a->getFileContent();
 
-    cout << "palabra :" << v.at(0) << endl;
-
-    palabras.push_back("cat");
-    palabras.push_back("dig");
-    palabras.push_back("dog");
-    palabras.push_back("fig");
-    palabras.push_back("fin");
-    palabras.push_back("fine");
-    palabras.push_back("fog");
-    palabras.push_back("log");
-    palabras.push_back("wine");
-
-
+    /* muestro las palabras
+    cout << "palabras ingresadas: ";
+    vector< string >::iterator it;
+    for (it = palabras.begin(); it < palabras.end(); it++){
+        cout << " " << *it;
+    }
+    cout << endl << endl;
+    */
     cout << maxEditStepLadders(0, -1) << endl;
 
     return 0;
