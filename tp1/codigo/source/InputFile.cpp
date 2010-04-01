@@ -1,4 +1,4 @@
-#include "InputFile.h"
+#include "../include/InputFile.h"
 #include <fstream>
 
 //---------------------------------------------------------------------------------------
