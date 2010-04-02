@@ -1,30 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include "..\include\InputFile.h"
+#include <time.h>
+
 // Bishops.cpp : Defines the entry point for the console application.
 //
-
-#include "stdafx.h"
-#include <vector>
-#include <iostream>
 
 using namespace std;
 
 typedef vector<vector<int> > tTablero;
 
-//const ocupado = true;
-const desocupado = 0;
+const int desocupado = 0;
 
-void mostrarMatriz(vector<vector<int> > t){
+/*void mostrarMatriz(vector<vector<int> > t){
 	int i,j;
 	int n = t.size();
 
 	for (i = 0; i<n; i++){
 		for (j = 0; j<n; j++){
-			cout << t[i][j] << " ";			
+			cout << t[i][j] << " ";
 		}
 		cout << endl;
 	}
 	cout << endl;
+}*/
+
+string valorIzquierdo(string s){
+    int indiceEspacio = s.find(" ");
+    return s.substr(0,indiceEspacio);
 }
 
+string valorDerecho(string s){
+    int indiceEspacio = s.find(" ");
+    return s.substr(indiceEspacio+1, s.length());
+}
+
+int str2int (const string &str) {
+    stringstream ss(str);
+    int n;
+    ss >> n;
+    return n;
+}
 
 bool esAtacado(tTablero& t, int i, int j){
 	int fila,columna;
@@ -70,14 +88,14 @@ bool esAtacado(tTablero& t, int i, int j){
 }
 
 bool seRespetanPosicionesRelativas(tTablero& t, int i, int j, int alfil){
-	
+
 	int n = t.size();
 
-	int fila, columna;	
+	int fila, columna;
 
 	for (fila = 0; fila<n; fila++){
 		for (columna = 0; columna < n; columna++){
-			
+
 			if (fila < i){
 				if (t[fila][columna] != desocupado && t[fila][columna] > alfil)
 					return false;
@@ -100,64 +118,87 @@ bool seRespetanPosicionesRelativas(tTablero& t, int i, int j, int alfil){
 						return false;
 				}
 			}
-			
-		}		
+		}
 	}
 
 	return true;
 }
 
-void go(tTablero& t, int &k, int &n, int& cantSoluciones, int cantAlfilesColocados, int ultimoAlfilPuesto){
+void go(tTablero& t, int &k, int &n, long long& cantSoluciones, int cantAlfilesColocados, int ultimoAlfilPuesto){
 
 	int i,j;
 
 	if (cantAlfilesColocados == k){
-		cantSoluciones++;		
+		cantSoluciones++;
 	}else{
-		
+
 		for (i=0; i<n; i++){
 			for (j=0; j<n; j++){
-				
+
 				if (t[i][j] == desocupado && !esAtacado(t,i,j) && seRespetanPosicionesRelativas(t,i,j,ultimoAlfilPuesto + 1)){
 					t[i][j] = ultimoAlfilPuesto + 1;
 					go(t,k,n,cantSoluciones,cantAlfilesColocados+1, ultimoAlfilPuesto + 1);
 					t[i][j] = desocupado;
-				}				
+				}
 			}
 		}
-	}	
+	}
+}
+
+long long cantSoluciones(int n, int k){
+
+	if (k > n){
+		return 0;
+	}else{
+
+		tTablero tablero;
+		int i, j;
+
+		//Cargo la matriz con todos false
+		tablero.resize(n);
+
+		for (i = 0; i<n; i++){
+			tablero[i].resize(n);
+		}
+
+		for (i = 0; i<n; i++){
+			for (j = 0; j<n; j++){
+				tablero[i][j] = false;
+			}
+		}
+		/////////////////////////////////
+
+		long long cantSoluciones = 0;
+		int cantAlfilesColocados = 0;
+		int ultimoAlfilPuesto = 0;
+
+		go(tablero,k,n,cantSoluciones,cantAlfilesColocados, ultimoAlfilPuesto);
+
+		return cantSoluciones;
+	}
 }
 
 int main(int argc, char* argv[])
 {
-	int k, n;
-	tTablero tablero;
-	int i, j;
+    InputFile* a = new InputFile();
 
-	n = 8;
-	k = 6;
+    a->openFile(argv[1]);
+    //a->openFile("entrada.txt");
 
-	//Cargo la matriz con todos false
-	tablero.resize(n);
+    vector<string> valores = a->getFileContent();
 
-	for (i = 0; i<n; i++){
-		tablero[i].resize(n);
-	}
+    long long cant;
+    int ind = 0;
+    int n = str2int(valorIzquierdo(valores[ind]));
+    int k = str2int(valorDerecho(valores[ind]));
 
-	for (i = 0; i<n; i++){
-		for (j = 0; j<n; j++){
-			tablero[i][j] = false;
-		}
-	}
-	/////////////////////////////////
-
-	int cantSoluciones = 0;
-	int cantAlfilesColocados = 0;
-	int ultimoAlfilPuesto = 0;
-
-	go(tablero,k,n,cantSoluciones,cantAlfilesColocados, ultimoAlfilPuesto);
-
-	cout << "formas de poner alfiles: " << cantSoluciones << endl;
+    while (n != 0 || k != 0){
+        cant = cantSoluciones(n,k);
+        cout << "Cantidad de formas: " << cant << endl;
+        ind++;
+        n = str2int(valorIzquierdo(valores[ind]));
+        k = str2int(valorDerecho(valores[ind]));
+    }
 
 	return 0;
 }
