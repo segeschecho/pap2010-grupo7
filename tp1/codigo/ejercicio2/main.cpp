@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include "..\include\InputFile.h"
 #include <time.h>
 
@@ -180,6 +181,9 @@ long long cantSoluciones(int n, int k){
 
 int main(int argc, char* argv[])
 {
+    ofstream salida("salida.txt");
+    //ofstream salida(argv[2));
+
     InputFile* a = new InputFile();
 
     a->openFile(argv[1]);
@@ -194,11 +198,14 @@ int main(int argc, char* argv[])
 
     while (n != 0 || k != 0){
         cant = cantSoluciones(n,k);
-        cout << "Cantidad de formas: " << cant << endl;
+        salida << cant << endl;
+        //cout << "Cantidad de formas: " << cant << endl;
         ind++;
         n = str2int(valorIzquierdo(valores[ind]));
         k = str2int(valorDerecho(valores[ind]));
     }
+
+    salida.close();
 
 	return 0;
 }
