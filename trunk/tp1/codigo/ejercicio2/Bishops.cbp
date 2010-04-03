@@ -30,12 +30,9 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add option="-g" />
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
-		<Unit filename="..\include\InputFile.h" />
-		<Unit filename="..\source\InputFile.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

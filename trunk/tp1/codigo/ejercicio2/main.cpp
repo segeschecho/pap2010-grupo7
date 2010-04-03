@@ -2,48 +2,14 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <fstream>
-#include "..\include\InputFile.h"
-#include <time.h>
 
 // Bishops.cpp : Defines the entry point for the console application.
 //
-
 using namespace std;
 
 typedef vector<vector<int> > tTablero;
 
 const int desocupado = 0;
-
-/*void mostrarMatriz(vector<vector<int> > t){
-	int i,j;
-	int n = t.size();
-
-	for (i = 0; i<n; i++){
-		for (j = 0; j<n; j++){
-			cout << t[i][j] << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
-}*/
-
-string valorIzquierdo(string s){
-    int indiceEspacio = s.find(" ");
-    return s.substr(0,indiceEspacio);
-}
-
-string valorDerecho(string s){
-    int indiceEspacio = s.find(" ");
-    return s.substr(indiceEspacio+1, s.length());
-}
-
-int str2int (const string &str) {
-    stringstream ss(str);
-    int n;
-    ss >> n;
-    return n;
-}
 
 bool esAtacado(tTablero& t, int i, int j){
 	int fila,columna;
@@ -181,31 +147,16 @@ long long cantSoluciones(int n, int k){
 
 int main(int argc, char* argv[])
 {
-    ofstream salida("salida.txt");
-    //ofstream salida(argv[2));
-
-    InputFile* a = new InputFile();
-
-    a->openFile(argv[1]);
-    //a->openFile("entrada.txt");
-
-    vector<string> valores = a->getFileContent();
+    int n, k;
+    scanf("%i %i", &n, &k);
 
     long long cant;
-    int ind = 0;
-    int n = str2int(valorIzquierdo(valores[ind]));
-    int k = str2int(valorDerecho(valores[ind]));
 
     while (n != 0 || k != 0){
         cant = cantSoluciones(n,k);
-        salida << cant << endl;
-        //cout << "Cantidad de formas: " << cant << endl;
-        ind++;
-        n = str2int(valorIzquierdo(valores[ind]));
-        k = str2int(valorDerecho(valores[ind]));
+        cout << cant << endl;
+        scanf("%i %i", &n, &k);
     }
-
-    salida.close();
 
 	return 0;
 }
