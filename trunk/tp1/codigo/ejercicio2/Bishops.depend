@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1270336026 source:c:\documents and settings\administrador\mis documentos\backup\facultad\materias\4 año\problemas algoritmos y programacion\tp1\codigo\ejercicio2\main.cpp
+	<iostream>
+	<vector>
+	<string>
+	<sstream>
+
