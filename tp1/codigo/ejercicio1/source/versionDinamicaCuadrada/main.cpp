@@ -7,7 +7,7 @@ using namespace std;
 
 int letrasDiferentes(int p1, int p2);
 bool sePuedeAgregar(int p1, int p2);
-int maxEditStepLadders(int inicio, int fin, int i);
+int maxEditStepLadders(int palabraActual, int anteriorAgregada);
 
 
 /* var global donde estan las palabras */
@@ -28,7 +28,7 @@ int main()
 /*
     InputFile *a = new InputFile();
     //a->openFile(archivo);
-    a->openFile("25milLargo16.txt");
+    a->openFile("25milLargo5.txt");
     palabras = a->getFileContent();
 
     // genero el tamanio del vector y lo inicio en 1
@@ -37,30 +37,21 @@ int main()
 */
     string s;
     int i = 0;
-    int res = 1;
     //limpio el vector
     vectorLargos.clear();
 
     cin >> s;
 
     while (s.compare("\\0") != 0){
+        palabras.push_back(s);
         i++;
         //alargo el vector de las soluciones con valores 1
-        vector<int>::iterator it;
-        it = vectorLargos.begin();
-        it = vectorLargos.insert ( it , 1 );
-
-        vector<string>::iterator it2;
-        it2 = palabras.begin();
-        it2 = palabras.insert ( it2 , s );
-
-        res = maxEditStepLadders(0, palabras.size() - 1, 0);
-
+        vectorLargos.resize(i, 1);
 
         cin >> s;
     }
 
-    cout << res;
+    cout << maxEditStepLadders(0, palabras.size() - 1);
 
     return 0;
 }
@@ -118,7 +109,7 @@ bool sePuedeAgregar(int p1, int p2){
 /***
 * recibe los indices BIEN!(el indice posteriors)
 ****/
-int maxEditStepLadders(int inicio, int fin, int i){
+int maxEditStepLadders(int inicio, int fin){
     /* cantidad de elementos */
     int tam = fin - inicio + 1;
     int maxRes = 1;
@@ -137,7 +128,7 @@ int maxEditStepLadders(int inicio, int fin, int i){
         vectorLargos[fin - 1] = 2;
 
     /* recorro de atras para adelante */
-//    for (int i = fin - 2; i >= inicio; i--){
+    for (int i = fin - 2; i >= inicio; i--){
         int maximaEscalera = 1; // siempre hay una escalera de largo 1
         /* me quedo con la escalera mas grande desde i hasta fin */
         for(int k = i + 1; k <= fin; k++){
@@ -151,7 +142,7 @@ int maxEditStepLadders(int inicio, int fin, int i){
         vectorLargos[i] = maximaEscalera;
         if (maximaEscalera > maxRes)
             maxRes = maximaEscalera;
-//    }
+    }
 
     /* ahora busco la escalera mas larga en el vector */
     return maxRes;
