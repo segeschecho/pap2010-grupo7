@@ -1,15 +1,11 @@
-#include <iostream>
+/*#include <iostream>
 #include <vector>
-#include <string>
-#include <sstream>
 
 // Bishops.cpp : Defines the entry point for the console application.
 //
 using namespace std;
 
-typedef long entero;
-
-void go(vector<bool>& DiagonalSubida, vector<bool>& DiagonalBajada, int &k, int &n, entero& cantSoluciones, int cantAlfilesColocados, int ultimaFila, int ultimaColumna){
+void go(vector<bool>& DiagonalSubida, vector<bool>& DiagonalBajada, int &k, int &n, long& cantSoluciones, int cantAlfilesColocados, int ultimaFila, int ultimaColumna){
 
 	int i,j;
 
@@ -23,13 +19,14 @@ void go(vector<bool>& DiagonalSubida, vector<bool>& DiagonalBajada, int &k, int 
 
 				if (!DiagonalSubida[i+j] && !DiagonalBajada[i-j+n-1]){
 
-					DiagonalSubida[i+j] = true;
-					DiagonalBajada[i-j+n-1] = true;
+                    //Pongo un elemento en la posicion i j
+                    DiagonalSubida[i+j] = true;
+                    DiagonalBajada[i-j+n-1] = true;
 
-					go(DiagonalSubida, DiagonalBajada,k,n,cantSoluciones,cantAlfilesColocados+1, i, j+1);
+                    go(DiagonalSubida, DiagonalBajada,k,n,cantSoluciones,cantAlfilesColocados+1, i, j+1);
 
-					DiagonalSubida[i+j] = false;
-					DiagonalBajada[i-j+n-1] = false;
+                    DiagonalSubida[i+j] = false;
+                    DiagonalBajada[i-j+n-1] = false;
 
 				}
 				j++;
@@ -39,49 +36,196 @@ void go(vector<bool>& DiagonalSubida, vector<bool>& DiagonalBajada, int &k, int 
 	}
 }
 
-entero cantSoluciones(int n, int k){
+long cantSoluciones(int n, int k){
 
-	if (k > n*n){
-		return 0;
-	}else{
+    vector<bool> DiagonalSubida;
+    vector<bool> DiagonalBajada;
 
+    DiagonalBajada.resize((2*n)-1);
+    DiagonalSubida.resize((2*n)-1);
 
-		vector<bool> DiagonalSubida;
-		vector<bool> DiagonalBajada;
+    int i;
 
-		DiagonalBajada.resize((2*n)-1);
-		DiagonalSubida.resize((2*n)-1);
+    for (i = 0; i<n; i++){
+        DiagonalSubida[i] = false;
+        DiagonalBajada[i] = false;
+    }
 
-		int i;
+    long cantSoluciones = 0;
+    int cantAlfilesColocados = 0;
 
-		for (i = 0; i<n; i++){
-			DiagonalSubida[i] = false;
-			DiagonalBajada[i] = false;
-		}
+    go(DiagonalSubida,DiagonalBajada,k,n,cantSoluciones,cantAlfilesColocados, 0, 0);
 
-		entero cantSoluciones = 0;
-		int cantAlfilesColocados = 0;
+    return cantSoluciones;
 
-		go(DiagonalSubida,DiagonalBajada,k,n,cantSoluciones,cantAlfilesColocados, 0, 0);
-
-		return cantSoluciones;
-	}
 }
 
 int main(int argc, char* argv[])
 {
-    /*int n, k;
+    int n, k;
     scanf("%i %i", &n, &k);
 
-    entero cant;
+    long cant;
 
     while (n != 0 || k != 0){
         cant = cantSoluciones(n,k);
         cout << cant << endl;
         scanf("%i %i", &n, &k);
-    }*/
+    }
 
-    cout << cantSoluciones(8,6) << endl;
+	return 0;
+}*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+#include <vector>
+
+// Bishops.cpp : Defines the entry point for the console application.
+//
+using namespace std;
+
+
+bool par(int n){
+
+	if (n%2 == 0)
+		return true;
+
+	return false;
+}
+
+
+//IMPORTANTE: Si se llama a esta funcion con contarNegras=true, el valor inicial de ultimaColumna tiene que ser 0, si se llama con contarNegras=false el valor inicial de ultimaColumna tiene que ser 1.
+void go(vector<bool>& DiagonalSubida, vector<bool>& DiagonalBajada, int &k, int &n, long& cantSoluciones, int cantAlfilesColocados, int ultimaFila, int ultimaColumna, bool contarNegras){
+
+	int i,j;
+
+	if (cantAlfilesColocados == k){
+		cantSoluciones++;
+		//mostrarMatriz(DiagonalSubida,DiagonalBajada,n);
+	}else{
+
+
+		j = ultimaColumna;
+
+		for (i=ultimaFila; i<n; i++){
+			while (j<n){
+
+				if (!DiagonalSubida[i+j] && !DiagonalBajada[i-j+n-1]){
+
+                    //Pongo un elemento en la posicion i j
+                    DiagonalSubida[i+j] = true;
+                    DiagonalBajada[i-j+n-1] = true;
+
+                    go(DiagonalSubida, DiagonalBajada,k,n,cantSoluciones,cantAlfilesColocados+1, i, j+2, contarNegras);
+
+                    DiagonalSubida[i+j] = false;
+                    DiagonalBajada[i-j+n-1] = false;
+
+				}
+				j+=2;
+			}
+			if (contarNegras){
+				if (par(i+1))
+					j = 0;
+				else
+					j = 1;
+			}
+			else{
+				if (par(i+1))
+					j = 1;
+				else
+					j = 0;
+			}
+		}
+	}
+}
+
+long cantSoluciones(int n, int k){
+
+  	if (k > 2*(n-1) && n!=1){
+  	    return 0;
+  	}else{
+  	    if (k == 1){
+  	        return (n*n);
+  	    }else{
+
+            vector<bool> DiagonalSubida;
+            vector<bool> DiagonalBajada;
+
+            DiagonalBajada.resize((2*n)-1);
+            DiagonalSubida.resize((2*n)-1);
+
+            int i;
+
+            for (i = 0; i<n; i++){
+                DiagonalSubida[i] = false;
+                DiagonalBajada[i] = false;
+            }
+
+            long cantSoluciones = 0;
+            int cantAlfilesColocados = 0;
+
+            if (par(n)){
+
+                vector<long> solucionParcial;
+                solucionParcial.resize(k+1);
+
+                for (i=0; i<=k; i++){
+                    cantSoluciones = 0;
+                    go(DiagonalSubida,DiagonalBajada,i,n,cantSoluciones,cantAlfilesColocados, 0, 0, true);
+                    solucionParcial[i] = cantSoluciones;
+                }
+
+                cantSoluciones = 0;
+
+                for (i=0; i<=k; i++)
+                    cantSoluciones = cantSoluciones + (solucionParcial[i] * solucionParcial[k-i]);
+
+            }else{
+
+                vector<long> solucionParcialBlancas;
+                solucionParcialBlancas.resize(k+1);
+                vector<long> solucionParcialNegras;
+                solucionParcialNegras.resize(k+1);
+
+                for (i=0; i<=k; i++){
+                    cantSoluciones = 0;
+                    go(DiagonalSubida,DiagonalBajada,i,n,cantSoluciones,cantAlfilesColocados, 0, 0, true);
+                    solucionParcialNegras[i] = cantSoluciones;
+
+                    cantSoluciones = 0;
+                    go(DiagonalSubida,DiagonalBajada,i,n,cantSoluciones,cantAlfilesColocados, 0, 1, false);
+                    solucionParcialBlancas[i] = cantSoluciones;
+                }
+
+                cantSoluciones = 0;
+
+                for (i=0; i<=k; i++)
+                    cantSoluciones = cantSoluciones + (solucionParcialNegras[i] * solucionParcialBlancas[k-i]);
+            }
+
+            return cantSoluciones;
+        }
+  	}
+}
+
+int main(int argc, char* argv[])
+{
+    int n, k;
+    scanf("%i %i", &n, &k);
+
+    long cant;
+
+    while (n != 0 || k != 0){
+        cant = cantSoluciones(n,k);
+        cout << cant << endl;
+        scanf("%i %i", &n, &k);
+    }
 
 	return 0;
 }
+
+
