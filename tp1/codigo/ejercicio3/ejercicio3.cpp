@@ -102,7 +102,7 @@ public:
             mEnteros[ i ] += otroVLUI.mEnteros[ i ];
 
             // si hay carry
-            if( ( mEnteros[ i ] >= MAX_VALOR_COMPONENTE_VLUI ) && ( i == mEnteros.size() - 1 ) )
+            if( mEnteros[ i ] >= MAX_VALOR_COMPONENTE_VLUI )
             {
                 // si hay carry hasta mas alla del tamaño del VLUI, tengo que agregar un nuevo
                 // entero para poder tener en cuenta el carry
@@ -110,7 +110,6 @@ public:
                 {
                     mEnteros.push_back( 0 );
                 }
-
                 mEnteros[ i + 1 ] += mEnteros[ i ] / MAX_VALOR_COMPONENTE_VLUI;
                 mEnteros[ i ] = mEnteros[ i ] % MAX_VALOR_COMPONENTE_VLUI;
             }
@@ -277,7 +276,7 @@ void go( const char* fileName = NULL )
     {
         VeryLongUnsignedInt resultadoTestActual;
 
-        resultadoTestActual = resolver( tests[ i ] );
+        resultadoTestActual = resolver( tests[ i ] ); // afd
         resultados.push_back( resultadoTestActual );
     }
 
@@ -306,13 +305,6 @@ int main(int argc, char* argv[])
     {
         go();
     }
-/*
-
-    VeryLongUnsignedInt vli1;
-    vli1 = 1000000000;
-    cout << vli1;
-    system("PAUSE");
-*/
 
     return 0;
 
