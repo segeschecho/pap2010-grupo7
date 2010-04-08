@@ -7,57 +7,28 @@ using namespace std;
 
 int letrasDiferentes(int p1, int p2);
 bool sePuedeAgregar(int p1, int p2);
-int maxEditStepLadders(int inicio, int fin, int i);
+int maxEditStepLadders(int inicio, int fin);
 
 
 /* var global donde estan las palabras */
 vector <string> palabras;
 vector <int> vectorLargos;
+int maximaEscalera;
 
 int main()
 {
-
-    /*if (argc < 2){
-        cout << "debe ingresar el nombre del archivo";
-        return 1;
-    }
-
-    const char *archivo = argv[1];
-
-*/
-/*
-    InputFile *a = new InputFile();
-    //a->openFile(archivo);
-    a->openFile("25milLargo16.txt");
-    palabras = a->getFileContent();
-
-    // genero el tamanio del vector y lo inicio en 1
-    vectorLargos.clear();
-    vectorLargos.resize(palabras.size(), 1);
-*/
     string s;
-    int i = 0;
     int res = 1;
     //limpio el vector
     vectorLargos.clear();
+    maximaEscalera = 1;
 
-    cin >> s;
-
-    while (s.compare("\\0") != 0){
-        i++;
+    while (cin >> s){
         //alargo el vector de las soluciones con valores 1
-        vector<int>::iterator it;
-        it = vectorLargos.begin();
-        it = vectorLargos.insert ( it , 1 );
+        vectorLargos.push_back(1);
+        palabras.push_back(s);
 
-        vector<string>::iterator it2;
-        it2 = palabras.begin();
-        it2 = palabras.insert ( it2 , s );
-
-        res = maxEditStepLadders(0, palabras.size() - 1, 0);
-
-
-        cin >> s;
+        res = maxEditStepLadders(0, palabras.size());
     }
 
     cout << res;
@@ -81,6 +52,8 @@ int letrasDiferentes(int p1, int p2){
     int limite = min(s1.size(), s2.size());
     int diferencias = 0;
     int i = 0;
+
+    cout << "comparando: " << s1 << " = " << s2 << " : " << s2.compare(s1) << endl;;
 
     /* recorro las palabras y veo que letras tienen diferentes */
     while (diferencias < 2 && i < limite){
@@ -115,44 +88,36 @@ bool sePuedeAgregar(int p1, int p2){
     return true;
 }
 
-/***
-* recibe los indices BIEN!(el indice posteriors)
-****/
-int maxEditStepLadders(int inicio, int fin, int i){
+int maxEditStepLadders(int inicio, int fin){
     /* cantidad de elementos */
-    int tam = fin - inicio + 1;
-    int maxRes = 1;
+    int tam = fin - inicio;
 
     if (tam <= 2){
         if (tam == 1)
             return 1;
-        else
-            return sePuedeAgregar(fin - 1, fin) + 1;
+        else{
+            vectorLargos[fin - 1] = sePuedeAgregar(0, fin - 1) + 1;
+            return vectorLargos[fin - 1];
+        }
     }
-
-    /* inicio los ultimos elementos de vectorLargos */
-    /* si voy de la anteultima palabra a la ultima */
-    /* entonces el el largo de la escalera desde fin-1 a fin es 2 */
-    if(sePuedeAgregar(fin - 1, fin))
-        vectorLargos[fin - 1] = 2;
 
     /* recorro de atras para adelante */
 //    for (int i = fin - 2; i >= inicio; i--){
-        int maximaEscalera = 1; // siempre hay una escalera de largo 1
+        int mayorEscalera = 1; // siempre hay una escalera de largo 1
         /* me quedo con la escalera mas grande desde i hasta fin */
-        for(int k = i + 1; k <= fin; k++){
+        for(int k = fin - 2; k >= 0; k--){
 
-            if(sePuedeAgregar(i, k) && (1 + vectorLargos[k]) > maximaEscalera){
-                maximaEscalera = 1 + vectorLargos[k];
+            if(sePuedeAgregar(k, fin - 1) && (1 + vectorLargos[k]) > mayorEscalera){
+                mayorEscalera = 1 + vectorLargos[k];
             }
         }
 
         /* ahora sali del for y tengo la maxima escalera desde i a fin en maximaEscalera */
-        vectorLargos[i] = maximaEscalera;
-        if (maximaEscalera > maxRes)
-            maxRes = maximaEscalera;
+        vectorLargos[fin - 1] = mayorEscalera;
+        if (mayorEscalera > maximaEscalera)
+            maximaEscalera = mayorEscalera;
 //    }
 
     /* ahora busco la escalera mas larga en el vector */
-    return maxRes;
+    return maximaEscalera;
 }
