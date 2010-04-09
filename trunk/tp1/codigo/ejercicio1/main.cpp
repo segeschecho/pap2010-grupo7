@@ -50,42 +50,45 @@ void generarPalabras( const std::string& palabra, Vstring* resultado[] )
     }
 
     ///agrego letras
-    /* agrego letras al principio y filtro las que no van */
-    char primeraLetra = palabra[ 0 ];
-    for( int ascii = 97; ascii <= primeraLetra; ascii++ )
-    {
-        string temp;
+    if (palabra.size() < 16){
 
-        /* agrego la letra al principio */
-        temp.push_back( ascii );
-        temp.append( palabra );
-
-        /* la agrego al resultado */
-        resultado[ 2 ]->push_back( temp );
-        temp.clear();
-    }
-
-    /* agrego desde la segunda letra*/
-    for( int i = 1; i <= largoPalabra; i++ )
-    {
-        /* agrego todas las posibles letras en la posicion i */
-        for( int ascii = 97; ascii < 123; ascii++ )
+        /* agrego letras al principio y filtro las que no van */
+        char primeraLetra = palabra[ 0 ];
+        for( int ascii = 97; ascii <= primeraLetra; ascii++ )
         {
             string temp;
-            string parteIzq;
-            string parteDer;
 
-            /* inicio las var */
-            parteIzq = palabra.substr( 0, i );
-            parteDer = palabra.substr( i, largoPalabra );
-
-            temp = parteIzq;
+            /* agrego la letra al principio */
             temp.push_back( ascii );
-            temp.append( parteDer );
+            temp.append( palabra );
 
             /* la agrego al resultado */
             resultado[ 2 ]->push_back( temp );
             temp.clear();
+        }
+
+        /* agrego desde la segunda letra*/
+        for( int i = 1; i <= largoPalabra; i++ )
+        {
+            /* agrego todas las posibles letras en la posicion i */
+            for( int ascii = 97; ascii < 123; ascii++ )
+            {
+                string temp;
+                string parteIzq;
+                string parteDer;
+
+                /* inicio las var */
+                parteIzq = palabra.substr( 0, i );
+                parteDer = palabra.substr( i, largoPalabra );
+
+                temp = parteIzq;
+                temp.push_back( ascii );
+                temp.append( parteDer );
+
+                /* la agrego al resultado */
+                resultado[ 2 ]->push_back( temp );
+                temp.clear();
+            }
         }
     }
 }
@@ -143,12 +146,13 @@ int maxEditStepLadder( const Vstring& palabras )
             if( cantPosiblesES > 0 )
             {
                 sizeESActual = (*posiblesEditStepPalabraActual[ j ])[ 0 ].size();
-                if ( largoMaxEditStepLadder[ sizeESActual - 1 ]->size() > 0 )
+                if (sizeESActual != 0 && largoMaxEditStepLadder[ sizeESActual - 1 ]->size() > 0 )
                 {
                     for( size_t k = 0; k < cantPosiblesES; k++ )
                     {
                         string& potencialEditStep = ( *posiblesEditStepPalabraActual[ j ] )[ k ];
                         MapStringInt::const_iterator it = largoMaxEditStepLadder[ sizeESActual - 1 ]->find( potencialEditStep );
+                        //si encuentro la palabra actualizo el valor del step ladder actual
                         if( it != largoMaxEditStepLadder[ sizeESActual - 1 ]->end() )
                         {
                             if( maxEditStepLadderActual < it->second )
@@ -197,10 +201,16 @@ int main()
     string s;
     Vstring palabras;
 
-    while ( !cin.eof() )
+/*    while ( !cin.eof() )
     {
         getline( cin, s );
         palabras.push_back( s );
+    }
+*/
+    while(cin >> s){
+        //if (palabras.size() > 1)
+        //    cout << palabras.back() << " con " << s << " es menor? " << palabras.back().compare(s) << endl;
+        palabras.push_back(s);
     }
 
     cout << maxEditStepLadder(palabras);
