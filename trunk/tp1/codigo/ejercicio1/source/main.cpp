@@ -5,9 +5,8 @@
 
 using namespace std;
 
-int letrasDiferentes(int p1, int p2);
-bool sePuedeAgregar(int p1, int p2);
-int maxEditStepLadders(int inicio, int fin);
+int maxEditStepLadders(int fin);
+vector <string> generarPalabras(int indice);
 
 
 /* var global donde estan las palabras */
@@ -17,7 +16,7 @@ int maximaEscalera;
 
 int main()
 {
-    string s;
+/*    string s;
     int res = 1;
     //limpio el vector
     vectorLargos.clear();
@@ -28,96 +27,127 @@ int main()
         vectorLargos.push_back(1);
         palabras.push_back(s);
 
-        res = maxEditStepLadders(0, palabras.size());
+        res = maxEditStepLadders(palabras.size());
     }
 
     cout << res;
+*/
+
+    string s;
+    vector <string> vec;
+
+
+    s="holacaca";
+    palabras.push_back("hola");
+
+    vec = generarPalabras(0);
+
+
+    cout << "palabras generadas: " << endl;
+    for (int i = 0; i < vec.size(); i++){
+        cout << vec[i] << endl;
+    }
 
     return 0;
 }
 
-/***
-* letrasDiferentes: toma dos indices de palabras en el arreglo palabras
-* y devuelve la cantidad de letras diferentes entre estas,
-* la cantidad de diferencias esta limitada a 2, ya que si hay 2 o mas diferencias
-* ya no se puede obtener una de las palabras partiendo de la otra.
-*
-* La complejidad de esta funcion es lineal con respecto al largo de las palabras
-* asociadas a los indices.
-***/
-int letrasDiferentes(int p1, int p2){
-    string s1 = palabras[p1];
-    string s2 = palabras[p2];
+int maxEditStepLadders(int fin){
 
-    int limite = min(s1.size(), s2.size());
-    int diferencias = 0;
-    int i = 0;
+    /***
+    pasos:
+    1: tomar las palabra y generar sus posibles edit ladders
+    2: por cada una de estas palabras, ver si esta antes, usando busqueda
+    binaria (por que las palabras estan ordenadas!!), se pueden saltear las
+    palabras que sean mayores a la actual!!!
+    3: me quedo con el mayor step ladder de las palabras que estan, y lo pongo
+    en el valor de el elemento actual.
+    4: actualizo la var global que tiene la MAXIMA step ladder.
+    5: fin.
+    ****/
 
-    cout << "comparando: " << s1 << " = " << s2 << " : " << s2.compare(s1) << endl;;
-
-    /* recorro las palabras y veo que letras tienen diferentes */
-    while (diferencias < 2 && i < limite){
-        if(s1[i] != s2[i])
-            diferencias++;
-        i++;
-    }
-
-    return diferencias;
+    ///sacarr!!
+    return 1;
 }
 
+vector <string> generarPalabras(int indice){
+    /***
+    a-z esta entre los ascii 97-122 inclusive
+    ***/
+    int largoPalabra = palabras[indice].size();
+    char primeraLetra = palabras[indice][0];
+    vector <string> res;
 
-/***
-* sePuedeAgregar: dice si la palabra se puede o no agregar deacuerdo a la restriccion
-* que dice que las palabras tengan igual largo o difieran en a lo sumo 1 caracter y que
-* tengan a lo sumo 1 caracter de diferencia.
-*
-* la complejidad es lineal en el largo de las palñabras asociadas a p1 y p2, ya que
-* usa letrasDiferentes.
-***/
-bool sePuedeAgregar(int p1, int p2){
+    /* saco de a una letra por vez y lo agrego a res */
+    /* filtro tambien las palabras que son mayores a palabras[indice]*/
+    ///saco y modifico letras
+    for (int i = 0; i < largoPalabra; i++){
+        string temp;
+        string parteIzq;
+        string parteDer;
 
-    int diferencia = abs( (int)(palabras[p1].size() - palabras[p2].size()) );
+        /* inicio las var */
+        parteIzq = palabras[indice].substr(0, i);
+        parteDer = palabras[indice].substr(i + 1, largoPalabra);
 
-    if (diferencia > 1)
-        return false;
+        /* saco la letra i */
+        temp = parteIzq;
+        temp.append(parteDer);
 
-    if (letrasDiferentes(p1, p2) >= 2){
-        return false;
-    }
+        /* la agrego a res */
+        res.push_back(temp);
 
-    return true;
-}
+        ///modifico letras
+        /// se pueden filtrar letras si i == 0
+        for(int ascii = 97; ascii < 123; ascii++){
+            temp.clear();
+            temp = parteIzq;
+            temp.push_back(ascii);
+            temp.append(parteDer);
 
-int maxEditStepLadders(int inicio, int fin){
-    /* cantidad de elementos */
-    int tam = fin - inicio;
-
-    if (tam <= 2){
-        if (tam == 1)
-            return 1;
-        else{
-            vectorLargos[fin - 1] = sePuedeAgregar(0, fin - 1) + 1;
-            return vectorLargos[fin - 1];
+            /* la agrego a res */
+            res.push_back(temp);
         }
     }
 
-    /* recorro de atras para adelante */
-//    for (int i = fin - 2; i >= inicio; i--){
-        int mayorEscalera = 1; // siempre hay una escalera de largo 1
-        /* me quedo con la escalera mas grande desde i hasta fin */
-        for(int k = fin - 2; k >= 0; k--){
 
-            if(sePuedeAgregar(k, fin - 1) && (1 + vectorLargos[k]) > mayorEscalera){
-                mayorEscalera = 1 + vectorLargos[k];
-            }
+    ///agrego letras
+    /* agrego letras al principio y filtro las que no van */
+    for(int ascii = 97; ascii <= primeraLetra; ascii++){
+        string temp;
+
+        /* agrego la letra al principio */
+        temp.push_back(ascii);
+        temp.append(palabras[indice]);
+
+        /* la agrego a res */
+        res.push_back(temp);
+        temp.clear();
+    }
+
+    /* agrego desde la segunda letra*/
+    for(int i = 1; i <= largoPalabra; i++){
+        /* agrego todas las posibles letras en la posicion i */
+        for(int ascii = 97; ascii < 123; ascii++){
+            string temp;
+            string parteIzq;
+            string parteDer;
+
+            /* inicio las var */
+            parteIzq = palabras[indice].substr(0, i);
+            parteDer = palabras[indice].substr(i, largoPalabra);
+
+            temp = parteIzq;
+            temp.push_back(ascii);
+            temp.append(parteDer);
+
+            /* la agrego a res */
+            res.push_back(temp);
+            temp.clear();
         }
 
-        /* ahora sali del for y tengo la maxima escalera desde i a fin en maximaEscalera */
-        vectorLargos[fin - 1] = mayorEscalera;
-        if (mayorEscalera > maximaEscalera)
-            maximaEscalera = mayorEscalera;
-//    }
+    }
 
-    /* ahora busco la escalera mas larga en el vector */
-    return maximaEscalera;
+
+    /* devuelvo todo */
+    return res;
 }
