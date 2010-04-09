@@ -143,17 +143,19 @@ int maxEditStepLadder( const Vstring& palabras )
             if( cantPosiblesES > 0 )
             {
                 sizeESActual = (*posiblesEditStepPalabraActual[ j ])[ 0 ].size();
-            }
-
-            for( size_t k = 0; k < cantPosiblesES; k++ )
-            {
-                // Estoy seguro de que sizeESActual fue inicializada al iniciar este ciclo, pues sino cantPosiblesES = 0, entonces no entraria al ciclo
-                MapStringInt::const_iterator it = largoMaxEditStepLadder[ sizeESActual - 1 ]->find( ( *posiblesEditStepPalabraActual[ j ] )[ k ] );
-                if( it != largoMaxEditStepLadder[ sizeESActual - 1 ]->end() )
+                if ( largoMaxEditStepLadder[ sizeESActual - 1 ]->size() > 0 )
                 {
-                    if( maxEditStepLadderActual < it->second )
+                    for( size_t k = 0; k < cantPosiblesES; k++ )
                     {
-                        maxEditStepLadderActual = it->second;
+                        string& potencialEditStep = ( *posiblesEditStepPalabraActual[ j ] )[ k ];
+                        MapStringInt::const_iterator it = largoMaxEditStepLadder[ sizeESActual - 1 ]->find( potencialEditStep );
+                        if( it != largoMaxEditStepLadder[ sizeESActual - 1 ]->end() )
+                        {
+                            if( maxEditStepLadderActual < it->second )
+                            {
+                                maxEditStepLadderActual = it->second;
+                            }
+                        }
                     }
                 }
             }
