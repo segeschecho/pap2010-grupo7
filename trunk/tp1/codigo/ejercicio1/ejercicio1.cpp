@@ -1,8 +1,7 @@
 #include <iostream>
 #include <vector>
-#include <map>
 #include <string>
-#include <fstream>
+//#include <fstream>
 using namespace std;
 
 typedef std::vector< std::string > Vstring;
@@ -37,14 +36,9 @@ bool probablementeExiste( const std::string& palabra, int offsetPosicion )
     return resultado;
 }
 
-int generarPalabras( const std::string& palabra, Vstring& resultado )
+int generarPalabras( const std::string& palabra, string resultado[] )
 {
     int contadorPotencialesES = 0;
-
-    int cantES = cantMaxPotencialesES( palabra.size() );
-    resultado.clear();
-    
-    resultado.resize( cantES );
 
     /***
     a-z esta entre los ascii 97-122 inclusive
@@ -55,18 +49,18 @@ int generarPalabras( const std::string& palabra, Vstring& resultado )
     /* en el mismo ciclo modifico letras de la palabra (saco y agrego letras)y */
     for (int i = 0; i < largoPalabra; i++)
     {
-        string temp;
         string parteIzq;
-        string parteDer;
 
         /* inicio las var */
         parteIzq = palabra.substr( 0, i );
 
         if( probablementeExiste( parteIzq, 0 ) )
         {
+            string parteDer;
             parteDer = palabra.substr( i + 1, largoPalabra );
             if( probablementeExiste( parteDer, i ) )
             {
+                string temp;
                 /* saco la letra i */
                 temp = parteIzq;
                 temp.append( parteDer );
@@ -83,7 +77,7 @@ int generarPalabras( const std::string& palabra, Vstring& resultado )
                 {
                     if( letraYaUsada[ i ][ ascii - CHAR_OFFSET_MIN ] )
                     {
-                        temp.clear();
+                        string temp;
                         temp = parteIzq;
                         temp.push_back( ascii );
                         temp.append( parteDer );
@@ -112,9 +106,8 @@ int generarPalabras( const std::string& palabra, Vstring& resultado )
             {
                 if( letraYaUsada[ 0 ][ ascii - CHAR_OFFSET_MIN ] )
                 {
-                    string temp;
-
                     /* agrego la letra al principio */
+                    string temp;
                     temp.push_back( ascii );
                     temp.append( palabra );
 
@@ -129,12 +122,13 @@ int generarPalabras( const std::string& palabra, Vstring& resultado )
         for( int i = 1; i <= largoPalabra; i++ )
         {
             string parteIzq;
-            string parteDer;
-
             parteIzq = palabra.substr( 0, i );
+
             if( probablementeExiste( parteIzq, 0 ) )
             {
+                string parteDer;
                 parteDer = palabra.substr( i, largoPalabra );
+
                 if( probablementeExiste( parteDer, i + 1 ) )
                 {
                     /* agrego todas las posibles letras en la posicion i */
@@ -215,8 +209,10 @@ int maxEditStepLadder( pair< string, int > palabras[], int cantPalabras )
 {
     int maxEscalera = 1;
 
-    //  El vector posiblesESActual contiene los potenciales edit step de la palabra actual
-    Vstring posiblesESActual;
+    //  El arreglo posiblesESActual contiene los potenciales edit step de la palabra actual
+    string* posiblesESActual;
+    
+    posiblesESActual = new string [ cantMaxPotencialesES( 16 ) ];
 
     for( int i = 0; i < cantPalabras; i++ )
     {
@@ -262,18 +258,15 @@ int main()
     pair< string, int > palabras[ 25000 ];
 
     int cantPalabras = 0;
-
 /*
-    fstream file( "test", ios_base::in );
+    fstream file( "test2", ios_base::in );
 
     while ( !file.eof() )
     {
         getline( file, s );
         palabras[ cantPalabras++ ] = pair< string, int >( s, 1 );
     }
-
 */
-
     while(cin >> s)
     {
         //if (palabras.size() > 1)
@@ -282,7 +275,6 @@ int main()
     }
 
     cout << maxEditStepLadder( palabras, cantPalabras );
-
 
     return 0;
 }
