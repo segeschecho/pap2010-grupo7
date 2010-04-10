@@ -1,194 +1,161 @@
 #include <iostream>
-#include <vector>
-#include <string>
-//#include <fstream>
+#include <fstream>
+
 using namespace std;
-
-typedef std::vector< std::string > Vstring;
-typedef std::vector< int > Vint;
-
+/*
+ *   a-z esta entre los ascii 97-122 inclusive
+ */
 #define CHAR_OFFSET_MIN 97
 #define CHAR_OFFSET_MAX 123
+#define MAX_PALABRAS 25000
+#define MAX_SIZE_PALABRA 16
 
-bool letraYaUsada[ 16 ][ 26 ];
+char palabras[ MAX_PALABRAS ][ MAX_SIZE_PALABRA + 1 ];
+int longPalabras[ MAX_PALABRAS ];
+int maxLadders[ MAX_PALABRAS ];
 
-inline int cantMaxPotencialesES( int sizePalabra )
+inline bool isLower( char c )
 {
-    // La cantidad maxima total de potenciales Edit Step de una palabra, siendo L su largo, es
-    //        L,            que corresponde a sacar la i-esima letra
-    // + 26 * L,            que corresponde a cambiar la i-esima letra por todas las letras del abecedario
-    // + 26 * (L + 1),      que corresponde a agregar una letra del abecedario antes de la iesima posicion (0 < i <= L)
-    // ----------------
-    // 53L + 26
-
-    return 56*sizePalabra + 26;
+    return CHAR_OFFSET_MIN <= c && c < CHAR_OFFSET_MAX;
 }
 
-bool probablementeExiste( const std::string& palabra, int offsetPosicion )
-{
-    bool resultado = true;
-    for( string::const_iterator it = palabra.begin(); it < palabra.end(); it++ )
-    {
-        resultado = resultado && letraYaUsada[ offsetPosicion ][ *it - CHAR_OFFSET_MIN ];
-        offsetPosicion++;
-    }
-
-    return resultado;
-}
-
-int generarPalabras( const std::string& palabra, string resultado[] )
-{
-    int contadorPotencialesES = 0;
-
-    /***
-    a-z esta entre los ascii 97-122 inclusive
-    ***/
-    int largoPalabra = palabra.size();
-
-    /* saco de a una letra por vez y lo agrego al resultado */
-    /* en el mismo ciclo modifico letras de la palabra (saco y agrego letras)y */
-    for (int i = 0; i < largoPalabra; i++)
-    {
-        string parteIzq;
-
-        /* inicio las var */
-        parteIzq = palabra.substr( 0, i );
-
-        if( probablementeExiste( parteIzq, 0 ) )
-        {
-            string parteDer;
-            parteDer = palabra.substr( i + 1, largoPalabra );
-            if( probablementeExiste( parteDer, i ) )
-            {
-                string temp;
-                /* saco la letra i */
-                temp = parteIzq;
-                temp.append( parteDer );
-
-                /* la agrego al resultado */
-                resultado[ contadorPotencialesES++ ] = temp;
-            }
-            
-            if( probablementeExiste( parteDer, i + 1 ) )
-            {
-                // modifico letras
-                // se pueden filtrar letras si i == 0
-                for( int ascii = CHAR_OFFSET_MIN; ascii < CHAR_OFFSET_MAX; ascii++ )
-                {
-                    if( letraYaUsada[ i ][ ascii - CHAR_OFFSET_MIN ] )
-                    {
-                        string temp;
-                        temp = parteIzq;
-                        temp.push_back( ascii );
-                        temp.append( parteDer );
-
-                        /* la agrego a res */
-                        resultado[ contadorPotencialesES++ ] = temp;
-                    }
-                }
-            }
-        }
-    }
-
-    // agrego letras
-    if ( palabra.size() < 16 )
-    {
-        if( probablementeExiste( palabra, 1 ) )
-        {
-            /*
-             *  agrego letras al principio. Notar que ignoramos aquellos potenciales edit step
-             *  que empiecen con letra > palabra[ 0 ], dado que el input viene ordenado,
-             *  por lo tanto no existe ningun predecesor que empiece con letras > palabra[ 0 ]
-             */
-
-            char primeraLetra = palabra[ 0 ];
-            for( int ascii = CHAR_OFFSET_MIN; ascii <= primeraLetra; ascii++ )
-            {
-                if( letraYaUsada[ 0 ][ ascii - CHAR_OFFSET_MIN ] )
-                {
-                    /* agrego la letra al principio */
-                    string temp;
-                    temp.push_back( ascii );
-                    temp.append( palabra );
-
-                    /* la agrego al resultado */
-                    resultado[ contadorPotencialesES++ ] = temp;
-                    temp.clear();
-                }
-            }
-        }
-
-        /* agrego desde la segunda letra*/
-        for( int i = 1; i <= largoPalabra; i++ )
-        {
-            string parteIzq;
-            parteIzq = palabra.substr( 0, i );
-
-            if( probablementeExiste( parteIzq, 0 ) )
-            {
-                string parteDer;
-                parteDer = palabra.substr( i, largoPalabra );
-
-                if( probablementeExiste( parteDer, i + 1 ) )
-                {
-                    /* agrego todas las posibles letras en la posicion i */
-                    for( int ascii = CHAR_OFFSET_MIN; ascii < CHAR_OFFSET_MAX; ascii++ )
-                    {
-                        if( letraYaUsada[ i ][ ascii - CHAR_OFFSET_MIN ] )
-                        {
-                            string temp;
-
-                            temp = parteIzq;
-                            temp.push_back( ascii );
-                            temp.append( parteDer );
-
-                            /* la agrego al resultado */
-                            resultado[ contadorPotencialesES++ ] = temp;
-                            temp.clear();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return contadorPotencialesES;
-}
-
-int buscar( const string& palabra, const pair< string, int > palabras[], int desde, int hasta )
+int buscar( const char palabra[], int desde, int hasta )
 {
     while( desde < hasta )
     {
         int medio = (desde + hasta) / 2;
 
+        int comparacion = strcmp( palabra, palabras[ medio ] );
         // Si palabra es igual a la palabra del medio del arreglo
         // entonces ya la encontre
-        if( palabra.compare( palabras[ medio ].first ) == 0 )
+        if( comparacion == 0 )
         {
             return medio;
         }
 
         // Si palabra es menor a la palabra del medio del arreglo
         // seguir buscando por la primer mitad del arreglo
-        if( palabra.compare( palabras[ medio ].first ) == -1 )
+        if( comparacion == -1 )
         {
             hasta = medio - 1;
         }
 
         // Si palabra es mayor a la palabra del medio del arreglo
         // seguir buscando por la segunda mitad del arreglo
-        if( palabra.compare( palabras[ medio ].first ) == 1 )
+        if( comparacion == 1 )
         {
             desde = medio + 1;
         }
     }
 
-    if( palabra.compare( palabras[ desde ].first ) != 0 )
+    if( strcmp( palabra, palabras[ desde ] ) != 0 )
     {
         return -1;
     }
 
     return desde;
+}
+
+inline void borrarLetra( int index, char palabra[], int longPalabra )
+{
+    for( int i = index; i < longPalabra; i++ )
+    {
+        palabra[ i ] = palabra[ i + 1 ];
+    }
+}
+
+inline void correrALaDerecha( int index, char palabra[], int longPalabra )
+{
+    palabra[ longPalabra + 1 ] = '\0';
+    for( int i = longPalabra; i > index; --i )
+    {
+        palabra[ i ] = palabra[ i - 1 ];
+    }
+}
+
+inline void agregarLetra( int index, char palabra[], char letra, int longPalabra )
+{
+    correrALaDerecha( index, palabra, longPalabra );
+
+    palabra[ index ] = letra;
+}
+
+int maxEditStepLadderPalabra( int indiceActual )
+{
+    char* palabra = palabras[ indiceActual ];
+    int longPalabra = longPalabras[ indiceActual ];
+
+    int maxLadderActual = 1;
+
+    char temp[ MAX_SIZE_PALABRA + 1 ];
+    strcpy( temp, palabra );
+
+    // elimino letras
+    // saco de a una letra por vez y lo agrego al resultado
+
+    // si el largo de la palabra es 1 no tenemos que eliminar letras
+
+    if( longPalabra > 1 )
+    {
+        for( int i = 0; i < longPalabra; i++ )
+        {
+            if( i == longPalabra - 1 || temp[ i + 1 ] <= palabra[ i ] )
+            {
+                borrarLetra( i, temp, longPalabra );
+
+                int indiceES = buscar( temp, 0, indiceActual );
+                if( indiceES >= 0 && maxLadders[ indiceES ] + 1 > maxLadderActual )
+                {
+                    maxLadderActual = maxLadders[ indiceES ] + 1;
+                }
+
+                agregarLetra( i, temp, palabra[ i ], longPalabra - 1 );
+            }
+        }
+    }
+
+    // cambio letras
+    // aprovechamos que el input viene ordenado, y no buscamos palabras que
+    // sean de mayor orden lexicografico
+    for( int i = 0; i < longPalabra; i++ )
+    {
+        for( int ascii = CHAR_OFFSET_MIN; ascii < palabra[ i ]; ascii++ )
+        {
+            temp[ i ] = ascii;
+            int indiceES = buscar( temp, 0, indiceActual );
+            if( indiceES >= 0 && maxLadders[ indiceES ] + 1 > maxLadderActual )
+            {
+                maxLadderActual = maxLadders[ indiceES ] + 1;
+            }
+        }
+
+        temp[ i ] = palabra[ i ];
+    }
+
+    // agrego letras
+    // aprovechamos que el input viene ordenado, y no buscamos palabras que
+    // sean de mayor orden lexicografico
+
+    // ademas, no buscamos palabras de longitud >= 16, entonces:
+    if( longPalabra < 16 )
+    {
+        correrALaDerecha( 0, temp, longPalabra );
+        for( int i = 0; i < longPalabra; i++ )
+        {
+            for( int ascii = CHAR_OFFSET_MIN; ascii < palabra[ i ]; ascii++ )
+            {
+                temp[ i ] = ascii;
+                int indiceES = buscar( temp, 0, indiceActual );
+                if( indiceES >= 0 && maxLadders[ indiceES ] + 1 > maxLadderActual )
+                {
+                    maxLadderActual = maxLadders[ indiceES ] + 1;
+                }
+            }
+            temp[ i ] = temp[ i + 1 ];
+        }
+    }
+
+    return maxLadderActual;
 }
 
 /*
@@ -205,76 +172,62 @@ int buscar( const string& palabra, const pair< string, int > palabras[], int des
  *          6: actualizo maxima escalera segun el step ladder encontrado para la palabra actual
  *      5: fin.
  */
-int maxEditStepLadder( pair< string, int > palabras[], int cantPalabras )
+
+inline int maxEditStepLadder( int maxLadders[], int cantPalabras )
 {
     int maxEscalera = 1;
 
-    //  El arreglo posiblesESActual contiene los potenciales edit step de la palabra actual
-    string* posiblesESActual;
-    
-    posiblesESActual = new string [ cantMaxPotencialesES( 16 ) ];
-
-    for( int i = 0; i < cantPalabras; i++ )
+    for( int i = 1; i < cantPalabras; i++ )
     {
-        if( i > 0 )
+        maxLadders[ i ] = maxEditStepLadderPalabra( i );
+
+        if( maxEscalera < maxLadders[ i ] )
         {
-            // Calculo todas las potenciales palabras edit step de la actual
-            int cantPosiblesES = generarPalabras( palabras[ i ].first, posiblesESActual );
-
-            int maxEditStepLadderActual = 0;
-            for( int j = 0; j < cantPosiblesES; j++ )
-            {
-                // busco cada potencial ES en el arreglo, pero solamente busco desde 0 a i - 1,
-                // siendo i el indice de la palabra actual
-                int indice = buscar( posiblesESActual[ j ], palabras, 0, i - 1 );
-                if( indice >= 0 && maxEditStepLadderActual < palabras[ indice ].second )
-                {
-                    maxEditStepLadderActual = palabras[ indice ].second;
-                }
-            }
-
-            palabras[ i ].second = maxEditStepLadderActual + 1;
-            if( maxEscalera < palabras[ i ].second )
-            {
-                maxEscalera = palabras[ i ].second;
-            }
-        }
-
-        // Habilito todas las letras de la palabra actual
-        int posicion = 0;
-        for( string::iterator it = palabras[ i ].first.begin(); it < palabras[ i ].first.end() && posicion < 16; it++ )
-        {
-            letraYaUsada[ posicion ][ *it - CHAR_OFFSET_MIN ] = true;
-            posicion++;
+            maxEscalera = maxLadders[ i ];
         }
     }
-
     return maxEscalera;
 }
 
 int main()
 {
-    string s;
-    pair< string, int > palabras[ 25000 ];
-
     int cantPalabras = 0;
-/*
-    fstream file( "test2", ios_base::in );
 
-    while ( !file.eof() )
+    fstream file ( "test2", ios_base::in );
+
+    while ( file >> palabras[ cantPalabras ] )
     {
-        getline( file, s );
-        palabras[ cantPalabras++ ] = pair< string, int >( s, 1 );
+        longPalabras[ cantPalabras ] = 0;
+        for( int i = 0; isLower( palabras[ cantPalabras ][ i ] ); i++ )
+        {
+            longPalabras[ cantPalabras ]++;
+        }
+
+        palabras[ cantPalabras ][ longPalabras[ cantPalabras ] ] = '\0';
+
+        maxLadders[ cantPalabras ] = 1;
+        cantPalabras++;
+    }
+
+/*
+    while( std::cin >>  palabras[ cantPalabras ] )
+    {
+        longPalabras[ cantPalabras ] = 0;
+        for( int i = 0; isLower( palabras[ cantPalabras ][ i ] ); i++ )
+        {
+            longPalabras[ cantPalabras ]++;
+        }
+
+        if ( longPalabras[ cantPalabras ] < MAX_SIZE_PALABRA )
+        {
+            palabras[ cantPalabras ][ longPalabras[ cantPalabras ] ] = '\0';
+        }
+
+        maxLadders[ cantPalabras ] = 1;
+        cantPalabras++;
     }
 */
-    while(cin >> s)
-    {
-        //if (palabras.size() > 1)
-        //    cout << palabras.back() << " con " << s << " es menor? " << palabras.back().compare(s) << endl;
-        palabras[ cantPalabras++ ] = pair< string, int >( s, 1 );
-    }
-
-    cout << maxEditStepLadder( palabras, cantPalabras );
+    std::cout << maxEditStepLadder( maxLadders, cantPalabras );
 
     return 0;
 }
