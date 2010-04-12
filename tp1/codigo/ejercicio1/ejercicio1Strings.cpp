@@ -171,7 +171,7 @@ int main()
 {
     int cantPalabras = 0;
 /*
-    ifstream file ( "test7", ios_base::in );
+    ifstream file ( "test4", ios_base::in );
 
     string s;
     while ( file >> s )
@@ -191,11 +191,11 @@ int main()
 
     if( cantPalabras == 0 )
     {
-        cout << "0";
+        cout << "0" << endl;
     }
     else
     {
-        cout << maxEditStepLadder( cantPalabras );
+        cout << maxEditStepLadder( cantPalabras ) << endl;
     }
 
     return 0;

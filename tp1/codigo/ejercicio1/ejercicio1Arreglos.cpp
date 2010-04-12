@@ -218,11 +218,11 @@ int main()
 
     if( cantPalabras == 0 )
     {
-        cout << "0";
+        cout << "0" << endl;
     }
     else
     {
-        cout << maxEditStepLadder( maxLadders, cantPalabras );
+        cout << maxEditStepLadder( maxLadders, cantPalabras ) << endl;
     }
 
     return 0;
