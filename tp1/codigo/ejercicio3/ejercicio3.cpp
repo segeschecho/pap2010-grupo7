@@ -2,18 +2,14 @@
 // Includes
 //-------------------------------------------------------------------
 
-#include<fstream>
 #include<iostream>
 #include<sstream>
 #include<vector>
-#include<map>
-#include<math.h>
 
 using namespace std;
 
 typedef std::pair< std::string, std::string > TestCase;
 
-#define CHAR_OFFSET 97
 #define MAX_DIGITOS_COMPONENTE_VLUI 9
 #define MAX_VALOR_COMPONENTE_VLUI 1000000000
 
@@ -162,22 +158,6 @@ void writeOutput( ostream& os, const vector< VeryLongUnsignedInt >& resultadosTe
     }
 }
 
-void writeOutputFile( const char* fileName, const vector< VeryLongUnsignedInt >& resultadosTests )
-{
-    fstream archivo(fileName, fstream::out);
-
-    if( archivo.fail() )
-	{
-        string expresion( "No se pudo escribir el archivo %s\n", fileName );
-        throw expresion;
-    }
-    else
-    {
-        writeOutput( archivo, resultadosTests );
-    }
-
-    archivo.close();
-}
 
 void readInput( istream& is, vector< TestCase >& testCases )
 {
@@ -201,30 +181,12 @@ void readInput( istream& is, vector< TestCase >& testCases )
     }
 }
 
-void readInputFile( const char* fileName, std::vector< TestCase >& testCases )
-{
-    fstream archivo(fileName, fstream::in);
-
-    if( archivo.fail() )
-	{
-        string expresion( "No se pudo abrir el archivo %s\n", fileName );
-        throw expresion;
-    }
-    else
-    {
-        readInput( archivo, testCases );
-    }
-
-    archivo.close();
-}
-
 //-------------------------------------------------------------------
 // Solucion al problema
 //-------------------------------------------------------------------
 
 VeryLongUnsignedInt resolver( const TestCase& test )
 {
-
      vector< VeryLongUnsignedInt > combinaciones(test.second.size());
 
      for( size_t i = 0; i < combinaciones.size(); i++ )
@@ -257,18 +219,11 @@ VeryLongUnsignedInt resolver( const TestCase& test )
      return combinaciones[ 0 ];
 }
 
-void go( const char* fileName = NULL )
+int main()
 {
     vector< TestCase > tests;
 
-    if( fileName == NULL )
-    {
-        readInput( cin, tests );
-    }
-    else
-    {
-        readInputFile( fileName, tests );
-    }
+    readInput( cin, tests );
 
     vector< VeryLongUnsignedInt > resultados;
     size_t size = tests.size();
@@ -276,35 +231,11 @@ void go( const char* fileName = NULL )
     {
         VeryLongUnsignedInt resultadoTestActual;
 
-        resultadoTestActual = resolver( tests[ i ] ); // afd
+        resultadoTestActual = resolver( tests[ i ] );
         resultados.push_back( resultadoTestActual );
     }
 
-    if( fileName == NULL )
-    {
-        writeOutput( cout, resultados );
-    }
-    else
-    {
-        std::string fileOutputName( fileName );
-        fileOutputName += "Out";
-        writeOutputFile( fileOutputName.c_str(), resultados );
-    }
-}
-
-int main(int argc, char* argv[])
-{
-    if ( argc > 1 )
-    {
-        for( int numArchivo = 1; numArchivo < argc; numArchivo++ )
-        {
-            go( argv[ numArchivo ] );
-        }
-    }
-    else
-    {
-        go();
-    }
+    writeOutput( cout, resultados );
 
     return 0;
 
