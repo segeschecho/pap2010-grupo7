@@ -1,3 +1,21 @@
 \chapter{Problema 1}
 
 \section{Edit Step Ladders}
+
+Un $edit$ $step$ es una transformación de una palabra $x$ en otra palabra $y$, tal que $x$ e $y$ son palabras en un diccionario de palabras y además $x$ puede ser transformada en $y$ $agregando$, $borrando$ o $cambiando$ una letra. La transformación de $dig$ a $dog$ o de $dog$ a $do$ son ambas $edit$ $steps$.
+
+Un $edit$ $step$ $ladder$ es una secuencia ordenada alfabeticamente $w_1$, $w_2$ ... $w_n$ tal que la transformación de $w_i$ a $w_{i+1}$ es un $edit$ $step$ para todos los $i$ de 1 a n-1.
+
+Se pide entonces, dado un diccionario de palabras, calcular el $edit$ $step$ $ladder$ mas largo.
+
+\textbf{Input:}
+
+El input consiste en un diccionario de palabras (en minuscula y ordenada alfabeticamente) una por linea. Ninguna palabra tiene más de 16 letras y no hay mas de 25000 palabras en el diccionario.
+
+\textbf{Output:}
+
+El output consiste en un numero, que indica el $edit$ $step$ $ladder$ mas largo.
+
+\textbf{Url:}
+
+\href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=970}{Problema de los edit step ladders}
