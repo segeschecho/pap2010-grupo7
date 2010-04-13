@@ -1,3 +1,25 @@
 \chapter{Problema 4}
 
-\section{Minimal coverage}
+\section{Minimal Coverage}
+
+Dados segmentos de una línea (en el eje X) con coordenadas [$L_i$,$R_i$]. Se debe elegir la minima cantidad de estos segmentos, tales que cubran completamente el segmento [$0$,$M$].
+
+\textbf{Input:}
+
+El input esta dividido en varias partes:
+
+La primera línea, consiste en un número e indica la cantidad de casos de test, seguido de una línea en blanco.
+
+Luego sigue el test, que consiste en un número, que identifica el segmento [$0$,$M$] (donde $1<= M <= 5000$), seguido de pares L R que identifican segmentos ($L_i$, $R_i$ $<=50000$, e $i <= 100000$), cada uno separados por una linea. Cada test termina con el par 0 0.
+
+\textbf{Output:}
+
+Para cada caso de test, la primera línea indica el mínimo numero de segmentos que pueden cubrir el segmento [$0$,$M$]. En las líneas siguientes, las coordenadas de los segmentos, ordenados por su coordenada izquierda ($L_i$), con el mismo formato que en el input. El par 0 0 no debe ser mostrado.
+
+Si [$0$,$M$] no puede ser cubierto, se debe devolver 0.
+
+Cada resultado entre tests, debe estar separado por una línea en blanco.
+
+\textbf{Url:}
+
+\href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=961}{Problema de minimal coverage}
