@@ -10,7 +10,7 @@ Escribir un programa tal que cuente el número de subsecuencias Z de X tal que ca
 
 La primer línea del input contiene un entero N indicando la cantidad de casos de test que siguen.
 
-La primer linea de cada caso de test contiene una cadena X de una longitud no mayor a 10000, compuesta enteramente de caracteres del alfabeto en minúscula. La segunda línea contiene otra cadena Z de longitud no mayor a 100, y también compuesta solamente de caracteres del alfabeto en minúscula. Se asegura que ni Z ni ningun prefijo o sufijo del mismo tendrá más de 10100 distintas ocurrencias en X como subsecuencia.
+La primer linea de cada caso de test contiene una cadena X de una longitud no mayor a 10000, compuesta enteramente de caracteres del alfabeto en minúscula. La segunda línea contiene otra cadena Z de longitud no mayor a 100, y también compuesta solamente de caracteres del alfabeto en minúscula. Se asegura que ni Z ni ningun prefijo o sufijo del mismo tendrá más de $10^{100}$ distintas ocurrencias en X como subsecuencia.
 
 \textbf{Salida:}
 
@@ -19,6 +19,11 @@ Para cada caso de test de la entrada, debe haber una salida correspondiente al n
 \textbf{Url:}
 
 \href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
+
+\subsection{Solución}
+El algoritmo que resuelve el problema es muy simple y fácil de implementar. Además logra una muy buena performance debido a su complejidad. Más adelante se explicará el mismo.
+Este problema se destaca particularmente de los demás debido a que los números (enteros) crecen rápidamente, hasta tener cientos de dígitos. Esto es así debido a la cantidad de distintas ocurrencias de Z en X, que como lo indica el enunciado, puede llegar a un orden de $10^{100}$. Los enteros en C++ tienen como máximo 8 bytes, es decir su máximo valor es $2^{64}$, o sea que no llega al orden de $10^{20}$, por lo tanto esto nos presenta un nuevo problema.
+Para resolver este nuevo problema creamos la clase VeryLongUnsignedInt, que representa enteros de una cantidad de dígitos infinitos.
 
 \subsection{Cálculo de complejidad}
 
