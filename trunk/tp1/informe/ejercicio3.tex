@@ -18,7 +18,7 @@ Para cada caso de test de la entrada, debe haber una salida correspondiente al n
 
 \textbf{Url:}
 
-\href{http://uva.onlinejudge.org/index.php?option=com_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
+\href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
 
 \subsection{Cálculo de complejidad}
 
@@ -31,14 +31,14 @@ Para cada caso de test de la entrada, debe haber una salida correspondiente al n
 \STATE longSubsec $\leftarrow$ largo de Subsecuencia
 \FOR{cada caracter C de la secuencia de fin a principio}
 	\FOR{cada caracter CSub de la subsecuencia tal que CSub $=$ C}
-		\IF CSub es el último caracter de la Subsecuencia
-			\STATE Combinaciones_{longSubsec - 1} $\leftarrow$ Combinaciones_{longSubsec - 1} + 1
+		\IF{CSub es el último caracter de la Subsecuencia}
+			\STATE $Combinaciones_{longSubsec - 1}$ $\leftarrow$ $Combinaciones_{longSubsec - 1} + 1$
 		\ELSE
 			\STATE i $\leftarrow$ indice del caracter CSub de la subsecuencia
-			\STATE Combinaciones_i $\leftarrow$ Combinaciones_{i + 1}
+			\STATE $Combinaciones_i$ $\leftarrow$ $Combinaciones_{i + 1}$
 		\ENDIF
 	\ENDFOR
 \ENDFOR
-\RETURN Combinaciones_0
+\RETURN $Combinaciones_0$
 \end{algorithmic}
 \end{algorithm}
