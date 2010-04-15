@@ -1,3 +1,44 @@
 \chapter{Problema 3}
 
 \section{Distinct Subsequences}
+
+Una subsecuencia de una secuencia dada es la secuencia con algunos elementos (posiblemente ninguno) faltantes. Formalmente, dada una secuencia $X = x_1, x_2, ..., x_m$, otra secuencia $Z = z_1, z_2, ..., z_k$ es una subsecuencia de X si existe una secuencia estrictamente creciente $< i_1, i_2, ..., i_k >$ de índices de X tal que para todo $j = 1, 2, ..., k$ tenemos $x_{i_j} = z_j$. Por ejemplo, $Z = bcdb$ es una subsecuencia de $X = abcbdab$ con su correspondiente secuencia de indices \verb|< 2, 3, 5, 7 >|.
+
+Escribir un programa tal que cuente el número de subsecuencias Z de X tal que cada una de ellas tiene una correspondiente subsecuencia de indices distinta.
+
+\textbf{Entrada:}
+
+La primer línea del input contiene un entero N indicando la cantidad de casos de test que siguen.
+
+La primer linea de cada caso de test contiene una cadena X de una longitud no mayor a 10000, compuesta enteramente de caracteres del alfabeto en minúscula. La segunda línea contiene otra cadena Z de longitud no mayor a 100, y también compuesta solamente de caracteres del alfabeto en minúscula. Se asegura que ni Z ni ningun prefijo o sufijo del mismo tendrá más de 10100 distintas ocurrencias en X como subsecuencia.
+
+\textbf{Salida:}
+
+Para cada caso de test de la entrada, debe haber una salida correspondiente al numero de ocurrencias de Z en X como subsecuencia. La salida de cada caso de test de entrada debe hacerse en líneas separadas.
+
+\textbf{Url:}
+
+\href{http://uva.onlinejudge.org/index.php?option=com_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
+
+\subsection{Cálculo de complejidad}
+
+\begin{algorithm}[H]
+\caption{Calcula la cantidad de ocurrencias de una subsecuencia en una secuencia}
+\label{alg:algoritmo1b}
+\begin{algorithmic}[1]
+\PARAMS{Secuencia, Subsecuencia}
+\STATE inicializar las Combinaciones para cada letra de la subsecuencia en 0
+\STATE longSubsec $\leftarrow$ largo de Subsecuencia
+\FOR{cada caracter C de la secuencia de fin a principio}
+	\FOR{cada caracter CSub de la subsecuencia tal que CSub $=$ C}
+		\IF CSub es el último caracter de la Subsecuencia
+			\STATE Combinaciones_{longSubsec - 1} $\leftarrow$ Combinaciones_{longSubsec - 1} + 1
+		\ELSE
+			\STATE i $\leftarrow$ indice del caracter CSub de la subsecuencia
+			\STATE Combinaciones_i $\leftarrow$ Combinaciones_{i + 1}
+		\ENDIF
+	\ENDFOR
+\ENDFOR
+\RETURN Combinaciones_0
+\end{algorithmic}
+\end{algorithm}
