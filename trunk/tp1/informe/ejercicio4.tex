@@ -38,22 +38,23 @@ A continuación se describirán los pasos mas importantes de la solución para que 
 \item Paso 3: Una vez obtenido el intervalo del paso 2, se actualiza el valor que representa lo cubierto hasta el momento, cambiándolo por la segunda coordenada del intervalo obtenido.
 \end{enumerate}
 
-A continuación se mostrará como el método encuentra la solución para un ejemplo, en donde se ingresan los intervalos $a = (-1,0)$, $b = (1,3)$, $c = (2,3)$, $d = (0,2)$ y donde el intervalo a cubrir es el $(0,3)$. 
+A continuación se mostrará como el método encuentra la solución para un ejemplo, en donde se ingresan los intervalos [1,3], [-2,0], [0,1], [-1,2] y donde el intervalo a cubrir es el [0,3]. 
 
 
 \begin{figure}[H]
 \centering
+\label{ej4_1}
 \subfigure[intervalos en el orden en que fueron ingresados.]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_0.png} }\hspace{0.5in} 
 \subfigure[intervalos una vez ordenados.]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_1.png}}\hspace{0.5in} 
-\subfigure[seleccionar los intervalos que tengan alguna coordenada en el intervalo actual $[0,0]$]{
+\subfigure[seleccionar los intervalos que tengan alguna coordenada en el intervalo actual $(0,0)$]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_2.png}}\hspace{0.5in} 
-\subfigure[se selecciona el que tiene la segunda coordenada mayor (intervalo d), se lo agrega como solución, y se actualiza el itervalo actual a $[0,2]$]{
+\subfigure[se selecciona el que tiene la segunda coordenada mayor (intervalo b), se lo agrega como solución, y se actualiza el intervalo cubierto, que será $(0,2)$]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_3.png}} \hspace{0.5in} 
-\subfigure[se seleccionan los intervalos siguientes y que tengan alguna coordenada dentro del intervalo actual $[0,2]$]{
+\subfigure[se seleccionan los intervalos siguientes y que tengan alguna coordenada dentro del intervalo actual $(0,2)$]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_4.png} }\hspace{0.5in} 
-\subfigure[se toma el de mayor segunda coordenada(intervalo b), se agrega como solución y se actualiza el intervalo actual a $(0,3)$]{
+\subfigure[se toma el de mayor segunda coordenada(intervalo d), se agrega como solución y se actualiza el intervalo cubierto a $(0,3)$]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_1_5.png}}
 \caption{Pasos hasta hallar la solución}
 \setcounter{subfigure}{0}
@@ -65,7 +66,26 @@ En cuanto al criterio de orden entre intervalos al momento de ordenarlos, elegim
 
 Ordenar los intervalos es escencialmente innecesario para el problema, pues para construir una solución se podría recorrer siempre todos los intervalos y avanzar en [0,M] elegiendo según el criterio del paso 2 del algoritmo. Sin embargo ordenar los intervalos nos asegura una mejor complejidad en peor caso.
 
-El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto. Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar \"huecos\" en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones. Veamoslo con un ejemplo:
+El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto. Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar \"huecos\" en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones y asegurando siempre la de menor cantidad de intervalos. Veamos denuevo el ejemplo de la figura \ref{ej4_1}. Si hubiésemos elegido el intervalo c en lugar del b, la cantidad de intervalos final sería igual (2 intervalos):
+
+\begin{figure}[H]
+\centering
+\label{ej4_2}
+\subfigure[seleccionar los intervalos que tengan alguna coordenada en el intervalo actual $(0,0)$]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_0.png}}\hspace{0.5in} 
+\subfigure[se selecciona el intervalo c en lugar del que tiene la segunda coordenada mayor (intervalo b), se lo agrega como solución, y se actualiza el intervalo cubierto, que será $(0,1)$]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_1.png}} \hspace{0.5in} 
+\subfigure[se seleccionan los intervalos siguientes y que tengan alguna coordenada dentro del intervalo actual $(0,1)$]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_2.png} }\hspace{0.5in} 
+\subfigure[el intervalo restante es el d, por lo tanto se lo agrega como solución, y se actualiza el intervalo cubierto a $(0,3)$]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_3.png}}
+\caption{Solución alternativa}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Como vemos, esta solución requiere la misma cantidad de intervalos que los que nuestro algoritmo calcula.
+
+Veamos otro caso. Supongamos que tenemos los intervalos [0,1], [1,2], [0,2] y que queremos cubrir el intervalo [0,2]:
 
 
 El paso 3 nos asegura que el algoritmo termina, y que lo hace al cubrir el intervalo [0,M] o al encontrar un hueco dentro del mismo con los intervalos dados.
