@@ -66,7 +66,9 @@ En cuanto al criterio de orden entre intervalos al momento de ordenarlos, elegim
 
 Ordenar los intervalos es escencialmente innecesario para el problema, pues para construir una solución se podría recorrer siempre todos los intervalos y avanzar en [0,M] elegiendo según el criterio del paso 2 del algoritmo. Sin embargo ordenar los intervalos nos asegura una mejor complejidad en peor caso.
 
-El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto (recorre linealmente la lista de intervalos, que a este punto está ordenada, sin volver atras, y va construyendo la solución). Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar ´huecos´ en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones y asegurando siempre la de menor cantidad de intervalos. Veamos de nuevo el ejemplo de la figura \ref{ej4_1}. Si hubiésemos elegido el intervalo c en lugar del b, la cantidad de intervalos final sería igual (2 intervalos). O sea, sea [x,y] un intervalo a cubrir, y sean los siguientes intervalos:
+El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto (recorre linealmente, sin volver atras, la lista de intervalos que a este punto está ordenada, y va construyendo la solución). Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar ´huecos´ en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones y asegurando siempre la de menor cantidad de intervalos. Veamos de nuevo el ejemplo de la figura \ref{ej4_1}. Si hubiésemos elegido el intervalo c en lugar del b, la cantidad de intervalos final sería igual (2 intervalos). Sin embargo esto no siempre es así. A modo de aclaración, veamos los casos que se pueden presentar al momento de elegir los intervalos que forman la solución.
+
+Sea [x,y] un intervalo a cubrir, y sean los siguientes intervalos:
 
 \begin{figure}[H]
 \centering
@@ -76,7 +78,7 @@ El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo sie
 \setcounter{subfigure}{0}
 \end{figure}
 
-Supongamos que tenemos un algoritmo alternativo \textbf{MC}, que, en lugar de elegir el intervalo que más cubre, selecciona cualquier otro intervalo al azar. Compararemos la solución que encuentra MC y la que encuentra nuestro algoritmo:
+Supongamos que tenemos un algoritmo alternativo \textbf{MC}, que en lugar de elegir el intervalo que más cubre (que comienza en el intervalo ya cubierto y tiene la mayor segunda coordenada), selecciona cualquier intervalo al azar entre los que comienzan en el intervalo ya cubierto y terminan fuera. Compararemos la solución que encuentra MC y la que encuentra nuestro algoritmo:
 
 \begin{figure}[H]
 \centering
@@ -85,7 +87,7 @@ Supongamos que tenemos un algoritmo alternativo \textbf{MC}, que, en lugar de el
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_2_1.png}} \hspace{0.5in} 
 \subfigure[solución que encuentra MC]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_2_2.png} }\hspace{0.5in} 
-\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\caption{Solución que encuentra MC, de igual cantidad de intervalos}
 \setcounter{subfigure}{0}
 \end{figure}
 
@@ -110,7 +112,7 @@ Las soluciones correspondientes a nuestro algoritmo y a MC son:
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_3_1.png}} \hspace{0.5in} 
 \subfigure[solución que encuentra MC]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_3_2.png} }\hspace{0.5in} 
-\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\caption{Solución que encuentra MC, de distinta cantidad de intervalos}
 \setcounter{subfigure}{0}
 \end{figure}
 
@@ -135,11 +137,11 @@ Las soluciones correspondientes a nuestro algoritmo y a MC son:
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_4_1.png}} \hspace{0.5in} 
 \subfigure[solución que encuentra MC]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_4_2.png} }\hspace{0.5in} 
-\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\caption{Nuestro algoritmo encuentra solución, pero MC no}
 \setcounter{subfigure}{0}
 \end{figure}
 
-Nuestro algoritmo encuentra solución, pero MC no, porque MC ignora el intervalo que más cubre en la primera iteración. Por lo tanto nuestro algoritmo encontró una mejor solución.
+En el primer paso MC ignora el intervalo que más cubre en la primera iteración, que es a, y elige b. En el segundo paso, como no vuelve a elegir entre intervalos ya descartados (a está descartado), nota que no hay ningún intervalo que comience en el intervalo ya cubierto (que en el segundo paso el intervalo cubierto es [x, b2]) y termine fuera, por lo tanto no encuentra solución. Vemos entonces que nuestro algoritmo encontró una mejor solución.
 
 Por último, tenemos otro caso:
 
@@ -160,39 +162,98 @@ Las soluciones correspondientes a nuestro algoritmo y a MC son:
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_5_1.png}} \hspace{0.5in} 
 \subfigure[solución que encuentra MC]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_5_2.png} }\hspace{0.5in} 
-\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\caption{Problema sin solución}
 \setcounter{subfigure}{0}
 \end{figure}
 
-Ninguno de los dos algoritmos encuentra solución, pues no la hay. No se puede cubrir el intervalo [x,y].
+Ninguno de los dos algoritmos encuentra solución, pues no la hay. No se puede cubrir el intervalo [x,y] en este caso.
 
 En conclusión, nuestro algoritmo es igual o mejor que los demas (en cuanto a encontrar la mínima cantidad de intervalos que cubre [0,M]).
 
-El paso 3 nos asegura que el algoritmo termina, y que lo hace al cubrir el intervalo [0,M] o al encontrar un hueco dentro del mismo con los intervalos dados.
+El paso 3 nos asegura que el algoritmo termina, y que lo hace al cubrir el intervalo [0,M] o al encontrar un hueco dentro del mismo con los intervalos dados. Si se encuentra que el intervalo cubierto hasta el momento es menor que M, y que no hay ningun par que comience en el intervalo cubierto y que termine fuera, entonces el algoritmo devuelve la solución sin intervalos. Si se llega a un intervalo cubierto mayor a M, entonces termina y devuelve los pares que lo cubren.
+
+\subsection{Detalles de implementación}
+Utilizamos \textbf{Vector} de la \textbf{Standart Template Library (STL)} de \textbf{C++} para representar la secuencia de intervalos, y creamos una propia clase \textbf{Intervalo} que es básicamente una tupla de enteros, que especifica los métodos de comparación entre ellos para poder realizar el ordenamiento y otros cálculos.
+
+Además creamos una clase \textbf{TestCase} para tratar cada caso de test de la entrada por separado. El algoritmo que resuelve el problema está todo incluído dentro del método llamado \"resolver\" de esta clase.
+
+La lectura del input y escritura del output serán obviados pues no forman parte de la escencia del problema.
 
 \subsection{Cálculo de complejidad}
 
 \begin{algorithm}[H]
-\caption{Calcula el step ladder de largo máximo}
+\caption{Calcula el cubrimiento minimal}
 \label{alg:algoritmo1b}
 \begin{algorithmic}[1]
-\PARAMS{cantidad de palabras}
-\STATE inicializar los maximos step ladders de cada palabra en 1
-\STATE inicializar maxLadder = 1
-\FOR{cada palabra P}
-	\STATE \COMMENT{borrado de letras}
-	\STATE borrar de a un caracter por vez de P y buscar esta nueva palabra en las palabras anteriores a P
-	\STATE si se encuentra actualizar el max step ladder de P
-	\STATE \COMMENT{reemplazo de letras}
-	\STATE reemplazar las letras de P de a una por vez por las letra del abecedario desde `a´ hasta la letra a cambiar, formando $P'$
-	\STATE buscar $P'$ en las palabras anteriores a P
-	\STATE si se encuentra actualizar el max step ladder de P
-	\STATE \COMMENT{agregado de letras}
-	\STATE agregar letras de a una por vez en cada posicion de P formando $P'$
-	\STATE buscar $P'$ en las palabras anteriores a P
-	\STATE si se encuentra actualizar el max step ladder de P
-	\STATE actualizar maxLadder
+\PARAMS{M, Intervalos}
+\STATE intervaloCubierto $\leftarrow$ 0
+\STATE inicializar resultado como lista de intervalos vacía
+\STATE ordenar los intervalos por su primera coordenada
+\STATE ignorar los primeros pares de la lista de intervalos que tienen su segunda coordenada menor a 0
+\FOR{cada intervalo I}
+	\IF{intervaloCubierto $>$ M}
+		\RETURN resultado
+	\ENDIF
+	\IF{la primer coordenada de I es mayor a intervaloCubierto}
+		\RETURN vacío
+	\ELSE
+		\IF{I es el de mayor segunda coordenada entre los que comienzan en el intervalo ya cubierto}
+			\STATE resultado.push\_back(I)
+			\STATE intervaloCubierto $\leftarrow$ segunda coordenada de I
+		\ENDIF
+	\ENDIF
 \ENDFOR
-\RETURN maxLadder
+\IF{intervaloCubierto $<$ M}
+	\RETURN vacío
+\ENDIF
+\RETURN resultado
 \end{algorithmic}
 \end{algorithm}
+
+Primero definimos algunas cuestiones con respecto a los símbolos que se utilizarán para demostrar la complejidad. El enunciado dice que se recibe una lista de casos de test, que contienen una lista de intervalos y el M, y para cada test, a partir de esta lista nuestro algoritmo calculará la salida. Llamamos $N$ a la cantidad de intervalos de la entrada para un caso de test.
+
+Las primeras dos líneas son inicializaciones de variables, donde en la línea 1 se inicializa el intervalo cubierto a 0, es decir que si bien haciendo esto estamos considerando que ya cubrimos el intervalo $[0,0]$, luego en la línea 2 inicializamos el resultado (que es la lista de intervalos de la solución) en vacío, por lo que al empezar ningún intervalo forma parte de la solución.
+
+La línea 3 ordena la lista de intervalos de entrada por su primera componente, lo que, utilizando el sort de la \textbf{Standart Template Library (STL)}, se puede lograr en aproximadamente $N*log(N)$ comparaciones en caso promedio y $N^2$ como peor caso.
+
+A partir de la línea 4, se recorre linealmente la lista de intervalos de entrada. La línea 4 ignora aquellos que no sirvan para la solución, avanzando el iterador.
+
+En la línea 5 comienza un ciclo donde se recorren todos los intervalos (o hasta que se cubre $[0,M]$), empezando desde donde terminó la línea 4. Entonces dicho ciclo y la línea 4 juntos se ejecutarán tantas veces como intervalos que haya (en peor caso), es decir, $N$ veces.
+
+Analicemos ahora los pasos dentro del ciclo. Las líneas 6 hasta la 11 tienen costo constante, pues se trata de comparaciones entre enteros.
+
+La línea 12 resume un ciclo que recorre la secuencia de intervalos y actualiza en cada paso el mejor par hasta el momento (aquel que comience en el intervalo ya cubierto y tenga mayor segunda coordenada). En realidad esto no se hace por cada intervalo, sino que este mismo ciclo se ocupa de avanzar en la lista hasta que el actual intervalo tenga su primera coordenada mayor al intervalo cubierto, es decir, que entre este par y el intervalo cubierto hay un hueco. El costo de avanzar en la secuencia de intervalos esta incluído en el costo de la línea 5. Las comparaciones y asignaciones de esta línea también se pueden lograr en costo constante, pues se trata simplemente de guardar un puntero a un intervalo y actualizar tal puntero y realizar operaciones entre enteros para comparar intervalos.
+
+La línea 13 que corresponde a la inserción (detrás) de un vector tiene costo constante si obviamos que los vectores pueden llegar a reajustar su tamaño (debido a la implementación de STL). Esto se puede evitar, por ejemplo, ajustando su tamaño previamente de forma conveniente.
+
+La línea 14 tiene costo constante por tratarse de una asignación de enteros.
+
+En la línea 17 finaliza el ciclo que itera los intervalos, por lo que a continuación, las siguientes líneas no serán afectadas por el factor $N$ que implica recorrer la secuencia.
+
+La línea 18 tiene costo constante por tratarse de una comparación entre enteros.
+
+La línea 19 tiene costo lineal $N$ por tratarse de limpiar el vector de resultados y devolver el mismo. Lo hacemos con el método clear de vector de STL.
+
+La línea 21 tiene costo constante pues solamente se devuelve el resultado.
+
+Con lo explicado anteriormente podemos concluír que el costo en peor caso será de 
+
+\medskip
+\centerline{ $N^2 + 2N$ }
+
+o sea
+
+\medskip
+\centerline{ $N^2$ }
+
+y en caso promedio será de
+
+\medskip
+\centerline{ $N*log( N ) + 2N$ }
+
+o sea
+
+\medskip
+\centerline{ $N*log( N ) + 2N$ }
+
+por lo tanto tiene una complejidad en peor caso de $O( N^2 )$ y en caso promedio $O( N*log( N ) )$.
