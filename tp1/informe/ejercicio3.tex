@@ -21,9 +21,14 @@ Para cada caso de test de la entrada, debe haber una salida correspondiente al n
 \href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
 
 \subsection{Solución}
-El algoritmo que resuelve el problema es muy simple y fácil de implementar. Además logra una muy buena performance debido a su complejidad. Más adelante se explicará el mismo.
-Este problema se destaca particularmente de los demás debido a que los números (enteros) crecen rápidamente, hasta tener cientos de dígitos. Esto es así debido a la cantidad de distintas ocurrencias de Z en X, que como lo indica el enunciado, puede llegar a un orden de $10^{100}$. Los enteros en C++ tienen como máximo 8 bytes, es decir su máximo valor es $2^{64}$, o sea que no llega al orden de $10^{20}$, por lo tanto esto nos presenta un nuevo problema.
-Para resolver este nuevo problema creamos la clase VeryLongUnsignedInt, que representa enteros de una cantidad de dígitos infinitos.
+La solución al problema se divide en 2 etapas básicas:
+\begin{itemize}
+\item Detectar los caracteres de la subsecuencia que aparecen en la secuencia. Esto se puede resolver simplemente iterando la secuencia y subsecuencia. Recorremos la subsecuencia de principio a fin, y la secuencia en el orden inverso.
+\item 
+\end{itemize}
+Este problema se destaca particularmente de los demás debido a que los números (enteros) crecen rápidamente, hasta tener cientos de dígitos. Esto es así debido a la cantidad de distintas ocurrencias de Z en X, que como lo indica el enunciado, puede llegar a un orden de $10^{100}$. Los enteros en C++ tienen como máximo 8 bytes, es decir su máximo valor es $2^{64}$, o sea que no llega al orden de $10^{20}$, por lo tanto esto nos presenta un nuevo problema. Para esto creamos la clase VeryLongUnsignedInt, que representa enteros de una cantidad infinita de dígitos.
+
+\subsection{Detalles de implementación}
 
 \subsection{Cálculo de complejidad}
 

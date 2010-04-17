@@ -4,7 +4,7 @@
 
 #include<vector>
 #include<iostream>
-#include <algorithm>
+#include<algorithm>
 
 using namespace std;
 
@@ -75,23 +75,22 @@ public:
         ListaIntervalos intervalos( mIntervalos );
         sort( intervalos.begin(), intervalos.end() );
 
-        resultado = cubrimientoMinimal( intervalos );
-    }
-
-private:
-    //-------------------------------------------------------------------
-    ListaIntervalos cubrimientoMinimal( ListaIntervalos& intervalos )
-    {
         int intervaloCubierto = 0;
-        int i = 0, size = intervalos.size();
-        ListaIntervalos resultado;
+        int i = 0, cantIntervalos = intervalos.size();
 
-        if( size != 0 )
+        if( cantIntervalos > 0 )
         {
-            while( i < size && intervaloCubierto < mM )
+            // Ignoro aquellos intervalos que no cubran nada del [0,infininto), ya que 
+            // el intervalo a cubrir es [0, M]
+            while( i < cantIntervalos && intervalos[ i ].R < 0 )
             {
-                Intervalo maximoIntervalo = intervalos[ i ];
-                while ( i < size && ( intervalos[ i ].L <= intervaloCubierto || intervalos[ i ].R <= intervaloCubierto ) )
+                i++;
+            }
+            
+            while( i < cantIntervalos && intervaloCubierto <= mM )
+            {
+                Intervalo& maximoIntervalo = intervalos[ i ];
+                while ( i < cantIntervalos &&  intervalos[ i ].L <= intervaloCubierto )
                 {
                     if( intervalos[ i ].R > maximoIntervalo.R )
                     {
@@ -100,9 +99,9 @@ private:
                     i++;
                 }
 
-                if( i < size && maximoIntervalo.L > intervaloCubierto )
+                if( maximoIntervalo.L > intervaloCubierto )
                 {
-                    return ListaIntervalos();
+                    break;
                 }
 
                 resultado.push_back( maximoIntervalo );
@@ -112,11 +111,10 @@ private:
 
         if ( intervaloCubierto < mM )
         {
-            return ListaIntervalos();
+            resultado.clear();
         }
-
-        return resultado;
     }
+
 protected:
     //-------------------------------------------------------------------
     int mM;
