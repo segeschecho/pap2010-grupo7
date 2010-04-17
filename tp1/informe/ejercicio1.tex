@@ -31,12 +31,11 @@ Comenzando entonces a describir el algoritmo creado para resolver el máximo edit
 
 \begin{enumerate}
 
-\item El primero, es el de recorrer cada una de las palabras desde el principio hasta el final.
-\item El segundo, se encarga de, dado una palabra actual ($P$), generar otras palabras que se consideren edit step de dicha $P$, es decir, que difieran de ésta en a lo sumo un caracter (ya sea quitándolo, agregándolo, o modificándolo).
-\item El tercer paso, utiliza las palabras generadas en el paso anterior y su función es verificar si cada una de éstas, está presente antes de $P$. Si alguna de éstas palabras es hallada, quiere decir que existe un edit step, por lo tanto, se puede agrandar en uno la distancia del step ladder de dicha palabra. En este paso, se utiliza lo calculado en pasos anteriores, es decir que cuando una palabra es hallada, la misma tiene asociado un valor que corresponde al mayor edit step ladder que termina en esa palabra. Por esta razón se ahorran cálculos innecesarios, que además ya fueron calculados anteriormente. Cabe aclarar que por cada palabra que es hallada, se verifica si se puede maximizar el edit step ladder hasta $P$, dicho de otra forma, se toma la palabra hallada que tenga mayor edit step ladder, de forma tal, que el valor asociado a la palabra actual $P$, sea el óptimo. En este paso entra en juego el principio de optimalidad que se plantea en la programación dinámica, ya que para asignarle el mejor step ladder que termina en la palabra actual $P$ (es decir el de mayor largo), el algoritmo se basa en decidir, cual es la palabra que maximiza su escalera y donde cada una de estas palabras tiene asociado con sigo, el mayor edit step ladder hasta ella (un valor óptimo). Por esta razón, podemos decir que siempre que se tome el mayor valor dentro de las palabras que pueden ir de ellas a $P$, el valor de la palabra actual $P$ será óptimo.
-\item Por último, el cuarto paso consiste en verificar si el edit step ladder calculado para $P$, es el mas grande entre todos los que se calcularon anteriormente. Si esto es cierto, el valor de edit step ladder de $P$ pasa a ser el posible valor que se retornará una vez que se finalice el recorrido de todas las palabras.
+\item Paso 1: es en donde se recorre cada una de las palabras desde el principio hasta el final.
+\item Paso 2: se encarga de, dado una palabra actual ($P$), generar otras palabras que se consideren edit step de dicha $P$, es decir, que difieran de ésta en a lo sumo un caracter (ya sea quitándolo, agregándolo, o modificándolo).
+\item Paso 4: utiliza las palabras generadas en el paso anterior y su función es verificar si cada una de éstas, está presente antes de $P$. Si alguna de éstas palabras es hallada, quiere decir que existe un edit step, por lo tanto, se puede agrandar en uno la distancia del step ladder de dicha palabra. En este paso, se utiliza lo calculado en pasos anteriores, es decir que cuando una palabra es hallada, la misma tiene asociado un valor que corresponde al mayor edit step ladder que termina en esa palabra. Por esta razón se ahorran cálculos innecesarios, que además ya fueron calculados anteriormente. Cabe aclarar que por cada palabra que es hallada, se verifica si se puede maximizar el edit step ladder hasta $P$, dicho de otra forma, se toma la palabra hallada que tenga mayor edit step ladder, de forma tal, que el valor asociado a la palabra actual $P$, sea el óptimo. En este paso entra en juego el principio de optimalidad que se plantea en la programación dinámica, ya que para asignarle el mejor step ladder que termina en la palabra actual $P$ (es decir el de mayor largo), el algoritmo se basa en decidir, cual es la palabra que maximiza su escalera y donde cada una de estas palabras tiene asociado con sigo, el mayor edit step ladder hasta ella (un valor óptimo). Por esta razón, podemos decir que siempre que se tome el mayor valor dentro de las palabras que pueden ir de ellas a $P$, el valor de la palabra actual $P$ será óptimo.
+\item Paso 4: consiste en verificar si el edit step ladder calculado para $P$, es el mas grande entre todos los que se calcularon anteriormente. Si esto es cierto, el valor de edit step ladder de $P$ pasa a ser el posible valor que se retornará una vez que se finalice el recorrido de todas las palabras.
 \end{enumerate}
-
 
 Para dejar un poco más en claro, el funcionamiento del algoritmo de solución, a continuación se muestra la ecuación de recurrencia asociada:
 
@@ -54,6 +53,39 @@ $maxStepLocal(i) = \left\{ \begin{array}{ll}
 $
 
 Como se puede observar, $maxStepLadders$ devuelve el resultado buscado, y en ella se puede ver de forma sobresaliente, que se efectúan los pasos $uno$ (recorrer las palabras) y $cuatro$ (quedarse con el mejor edit step ladder). En maxStepLocal, podemos observar que se llevan a cabo los pasos $dos$ (generar los posibles steps para una palabra) y $tres$ (seleccionar la que maximice el edit step ladder a la palabra actual).
+
+
+\subsection{Por que esta solución ?}
+
+En esta sección explicaremos por que este procedimiento funciona y llega a calcular la solución buscada. Como ya hemos visto, la solución consta de 4 grandes pasos que hemos mencionado anteriormente y que en esta sección se irán nombrando.
+
+Primero veremos que dicha solución es un algoritmo y termina. Es fácil de ver si se observa el paso 1, donde en él se van recorriendo todas las palabras una por una, desde el principio hasta el final. Lo que demuestra que el algoritmo en algún momento termina, mas específicamente, cuando se llega al final de la lista de palabras que viene dada en la entrada del problema. Notamos también que las operaciones que se realizan dentro de este ciclo, terminan en algún momento, para esto tomaremos en cuenta los pasos restantes. El paso 2, genera los posibles step para la palabra actual $P$, este procedimiento esta acotado primeramente por el largo de $P$ y también por la cantidad de letras en el alfabeto (para el caso de inserción y modificación), por esta razón, podemos observar que la cantidad de operaciones a realizar esta acotada por alguna de estas dos condiciones. El paso 3, busca cada palabra generada desde el inicio hasta $P$, esto se hace buscando binariamente aprovechando que las palabras se encuentran ordenadas alfabéticamente. Como se puede observar este algoritmo también termina y como la cantidad de palabras a buscar es finita, el paso 3 finaliza en algún momento. El paso 4 finaliza trivialmente, ya que se verifica si el valor de edit step ladder calculado es mas grande que el mejor de los anteriores que se tiene guardado.
+
+Luego de argumentar que la solución es un algoritmo y termina, resta argumentar por que la solución funciona y encuentra el valor buscado dentro de la lista de palabras dada en la entrada del problema. Esto lo podemos ver tomando un ejemplo como referencia y explicando por que en cada ciclo, en donde se toma una palabra (que se convierte en la palabra actual $P$)y se calcula el resultado al edit step mas largo que termina en $P$ puede ser el posible resultado del problema si se toma el valor mas grande entre el mayor de los edit steps calculados anteriormente y el del ciclo actual.
+
+Sean las palabras que se corresponden a una parte del ejemplo en la página del problema (cat dig dog fig fin fog), podemos observar como en cada paso se mantiene la idea de que el máximo edit step ladder es el calculado en el paso actual o el mayor de los anteriores.
+
+\begin{figure}[H]
+\centering
+\subfigure[inicio del algoritmo dados los datos de entrada]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso1.png}} \hspace{0.5in} 
+\subfigure[comenzando por la primer palabra, vemos que es la unica, y por lo tanto su edit step es de 1 (ella misma), el valor del resultado se actualiza en consecuencia]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso2.png} }\hspace{0.5in} 
+\subfigure[tomando la segunda palabra vemos que ninguno de los posibles steps que puede tener la misma no se encuentran antes, por lo tanto su edit step es 1 y el resultado no se actualiza]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso3.png}} \hspace{0.5in} 
+\subfigure[dig, una de las posibles steps de dog aparece antes, entonces el step de dog el step de dig mas 1, y se actualiza el resultado ya que es el mayor hasta el momento]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso4.png}} \hspace{0.5in} 
+\subfigure[misma situación entre fig y dig, en este caso el valor del resultado no se actualiza por que es el mismo]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso5.png}} \hspace{0.5in} 
+\subfigure[existe un único posible step para fin, que es fig, entonces el step maximo step para esta palabra es el valor de fig mas 1, el resultado se actualiza ya que es mayor]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso6.png}} \hspace{0.5in} 
+\subfigure[último paso, aunque el resultado no cambia, fog tiene 2 posibles step antes que el, en este caso se queda con el mayor de los 2 valores (que son iguales) y se le suma 1]{
+\includegraphics[scale=0.5]{./graficos/ej1/paso7.png}} \hspace{0.5in} 
+\caption{resolución del caso particular mencionado}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Como se puede observar en el ejemplo anterior, con dicho algoritmo se puede llegar a la solución buscada. Hay que tener en cuenta que existen otros algoritmos que también pueden llegar a la solución, por ejemplo hacer por cada palabra que se recorre, verificar todas las anteriores viendo si existe una que es edit step de la actual, en este caso si bien se llegaría a resolver el problema, el algoritmo no utiliza las propiedades de la lista de palabras ingresada (se encuentran ordenadas alfabéticamente), y esto repercute en el tiempo requerido para encontrar el valor buscado que es mayor. El algoritmo mostrado, tiene en cuenta dicha cualidad y de esta forma es posible bajar el tiempo requerido para hallar el valor buscado.
 
 
 \subsection{Cálculo de complejidad}
@@ -97,23 +129,29 @@ Las primeras dos lineas son inicializaciones de variables, donde en la linea 1 s
 
 En la linea 3 comienza un ciclo de tipo $for$ que termina en la linea 16, aquí se recorren todas las palabras de la entrada (se corresponde con el paso número $1$ en la introducción de la solución), dicho ciclo entonces se hará tantas veces como palabras haya en la entrada, es decir $N$ veces.
 
-En las partes comentadas como ´borrado de letras¨, ¨reemplazo de letras´ y ¨agregado de letras´ se efectua el paso número $2$, que consiste en generar los posibles edit step de la palabra actual. Las tres partes son similares en cuanto a pasos que se realizan para obtener los posibles edit step. La Idea principal en las tres partes consiste en recorrer cada posición de la palabra y realizar una operación (ya sea para modificar, agregar o quitar una letra) y luego ver si la nueva palabra obtenida se encuentra en la lista de palabras que están antes de $P$. Recorrer cada posición de una palabra queda en función del largo de la palabra ($L$). Como la lista de palabras se encuentra ordenada alfabeticamente, ver si cada nueva palabra generada está dentro de la lista antes de $P$ se puede saber realizando un busqueda binaria, que queda en función del logaritmo de la cantidad de palabras recorridas ($log_2(K)$, donde $K$ es la cantidad de palabras ya recorridas).
+En las partes comentadas como ´borrado de letras´, ´reemplazo de letras´ y ´agregado de letras´ se efectua el paso número $2$, que consiste en generar los posibles edit step de la palabra actual. Las tres partes son similares en cuanto a pasos que se realizan para obtener los posibles edit step. La Idea principal en las tres partes consiste en recorrer cada posición de la palabra y realizar una operación (ya sea para modificar, agregar o quitar una letra) y luego ver si la nueva palabra obtenida se encuentra en la lista de palabras que están antes de $P$. Recorrer cada posición de una palabra queda en función del largo de la palabra ($L$). Como la lista de palabras se encuentra ordenada alfabeticamente, ver si cada nueva palabra generada está dentro de la lista antes de $P$ se puede saber realizando un busqueda binaria, que queda en función del logaritmo de la cantidad de palabras recorridas ($log_2(K)$, donde $K$ es la cantidad de palabras ya recorridas y $L$ (en donde se realiza la comparación), por esta razón la busqueda queda en funcion de $L*log_(K)$. Esta búsqueda se pùede realizar en ese tiempo ya que se utiliza el método $binary_search$ que brinda la $STL$ de $C++$. Resumiendo, hacer cada una de las acciones en una palabra queda en función del largo $L$ (para recorrer cada posicion de $P$) y $L*log_s(K)$, por lo tanto hacer cada una queda en función de $L^2*log_2(K)$ (donde $K < N$)
 
-Con lo explicado anteriormente podemos ver que por cada ciclo del $for$ principal, se realizan 3 modificaciones de la palabra P, donde en cada una se recorre posicion por posicion de P y se busca en las palabras anteriores. Luego podemos decir que hacer un ciclo esta en funcion de hacer 3 veces el recorrido letra por letra y por cada una de ellas hacer una busqueda, que resultan en un costo de $3*L*log_2(K)$ (donde $K$ es la cantidad de palabras ya recorrida). Luego esto se realiza $N$ veces, entonces nos queda algo como lo siguiente:
+Como dijimos en el párrafo anterior. la idea de ´borrado de letras´, ´reemplazo de letras´ y ´agregado de letras´ consiste en recorrer cada una de las posiciones de $P$. Pero en los casos de  ´reemplazo de letras´ y ´agregado de letras´, se agrega un ciclo mas, que consiste en recorrer las letras del abecedario, agrega una constante más a la complejidad (la constante 26), que a la hora del calculo final será despreciable, pero que a esta altura la pondremos. Entonces, para estas 2 acciones la complejidad queda en $26*L^2*log_2(K)$ cada una.
+
+Con lo explicado anteriormente podemos ver que por cada ciclo del $for$ principal, se realizan 3 modificaciones de la palabra $P$, donde en cada una se recorre posición por posición de $P$ y se busca en las palabras anteriores. Luego podemos decir que hacer un ciclo esta en funcion de hacer 3 veces el recorrido letra por letra y por cada una de ellas hacer una busqueda y comparación, que resultan en un costo de $L^2*log_2(K) + 2*26*L^2*log_2(K)$ (donde $K$ es la cantidad de palabras ya recorrida). Luego esto se realiza $N$ veces, entonces nos queda algo como lo siguiente:
 
 \medskip
-\centerline{ $3*L*log_2(1) + 3*L*log_2(2) + ... + 3*L*log_2(N)$ }
-
-Dicha cuenta la podemos acotar superiormente, considerando que cada valor dentro de los logaritmos, son menores o iguales a $N$. Lo que resulta en lo siguiente:
-
-\centerline{ $3*L*log_2(1) + 3*L*log_2(2) + ... + 3*L*log_2(N) {\rm  \ } \le {\rm  \ } 
-3*L*log_2(N) + 3*L*log_2(N) + ... + 3*L*log_2(N) $}
+\centerline{ $(L^2*log_2(1) + 52*L^2*log_2(1)) + L^2*log_2(2) + 52*L^2*log_2(2) + ... + (L^2*log_2(N) + 52*L^2*log_2(N))$ }
 
 \centerline{=}
 
-\centerline{$3*L*N*log_2(N)$}
+\centerline{ $53*L^2*log_2(1) + 53*L^2*log_2(2) + ... + 53*L^2*log_2(N)$ }
 
-A su vez, $L$ puede ser acotado superiormente por $16$, lo que nos daría que la complejidad estaría en función de $48*N*log_2(N)$. Teniendo en cuenta el orden asintotico de esta complejidad, podemos despreciar las constantes y finalmente decir, que el algoritmo de solución esta en el orden de:
+Dicha cuenta la podemos acotar superiormente, considerando que cada valor dentro de los logaritmos, son menores o iguales a $N$. Lo que resulta en lo siguiente:
+
+\centerline{ $53*L^2*log_2(1) + 53*L^2*log_2(2) + ... + 53*L^2*log_2(N) {\rm  \ } \le {\rm  \ } 
+53*L^2*log_2(N) + 53*L^2*log_2(N) + ... + 53*L^2*log_2(N)$}
+
+\centerline{=}
+
+\centerline{$53*L^2*N*log_2(N)$}
+
+A su vez, $L$ puede ser acotado superiormente por $16$, lo que nos daría que la complejidad estaría en función de $53*N*log_2(N)$. Teniendo en cuenta el orden asintotico de esta complejidad, podemos despreciar las constantes y finalmente decir, que el algoritmo de solución esta en el orden de:
 
 \medskip
 \centerline{$O(N*log_2(N))$}
