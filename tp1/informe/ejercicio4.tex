@@ -66,27 +66,107 @@ En cuanto al criterio de orden entre intervalos al momento de ordenarlos, elegim
 
 Ordenar los intervalos es escencialmente innecesario para el problema, pues para construir una solución se podría recorrer siempre todos los intervalos y avanzar en [0,M] elegiendo según el criterio del paso 2 del algoritmo. Sin embargo ordenar los intervalos nos asegura una mejor complejidad en peor caso.
 
-El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto. Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar \"huecos\" en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones y asegurando siempre la de menor cantidad de intervalos. Veamos denuevo el ejemplo de la figura \ref{ej4_1}. Si hubiésemos elegido el intervalo c en lugar del b, la cantidad de intervalos final sería igual (2 intervalos):
+El paso 2 nos asegura que no elegiremos intervalos de más y que el algoritmo siempre avanza y nunca vuelve en el intervalo ya cubierto (recorre linealmente la lista de intervalos, que a este punto está ordenada, sin volver atras, y va construyendo la solución). Al considerar aquellos pares que tengan su primera coordenada dentro del intervalo ya cubierto evitamos dejar \"huecos\" en el desarrollo de la solución para no volver entre los intervalos ya vistos. Al elegir entre ellos aquel que tenga su mayor segunda coordenada logramos avanzar lo máximo posible en cada iteración, sin perder soluciones y asegurando siempre la de menor cantidad de intervalos. Veamos denuevo el ejemplo de la figura \ref{ej4_1}. Si hubiésemos elegido el intervalo c en lugar del b, la cantidad de intervalos final sería igual (2 intervalos). O sea, sea [x,y] un intervalo a cubrir, y sean los siguientes intervalos:
 
 \begin{figure}[H]
 \centering
-\label{ej4_2}
-\subfigure[seleccionar los intervalos que tengan alguna coordenada en el intervalo actual $(0,0)$]{
+\label{ej4_2_0}
+\subfigure[intervalo a cubrir $(x,y)$ e intervalos de entrada]{
 \includegraphics[scale=0.5]{./graficos/ej4/ej4_2_0.png}}\hspace{0.5in} 
-\subfigure[se selecciona el intervalo c en lugar del que tiene la segunda coordenada mayor (intervalo b), se lo agrega como solución, y se actualiza el intervalo cubierto, que será $(0,1)$]{
-\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_1.png}} \hspace{0.5in} 
-\subfigure[se seleccionan los intervalos siguientes y que tengan alguna coordenada dentro del intervalo actual $(0,1)$]{
-\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_2.png} }\hspace{0.5in} 
-\subfigure[el intervalo restante es el d, por lo tanto se lo agrega como solución, y se actualiza el intervalo cubierto a $(0,3)$]{
-\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_3.png}}
-\caption{Solución alternativa}
 \setcounter{subfigure}{0}
 \end{figure}
 
-Como vemos, esta solución requiere la misma cantidad de intervalos que los que nuestro algoritmo calcula.
+Supongamos que tenemos un algoritmo alternativo \textbf{MC}, que, en lugar de elegir el intervalo que más cubre, selecciona cualquier otro intervalo al azar. Compararemos la solución que encuentra MC y la que encuentra nuestro algoritmo:
 
-Veamos otro caso. Supongamos que tenemos los intervalos [0,1], [1,2], [0,2] y que queremos cubrir el intervalo [0,2]:
+\begin{figure}[H]
+\centering
+\label{ej4_2_1,2}
+\subfigure[solución que encuentra nuestro algoritmo]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_1.png}} \hspace{0.5in} 
+\subfigure[solución que encuentra MC]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_2_2.png} }\hspace{0.5in} 
+\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\setcounter{subfigure}{0}
+\end{figure}
 
+Como vemos, la solución alternativa requiere la misma cantidad de intervalos que los que nuestro algoritmo calcula, por lo tanto para este caso nuestro algoritmo encuentra igual cantidad de intervalos para cubrir [x,y] que MC.
+
+Veamos otro caso. Nuevamente tenemos el intervalo a cubrir [x,y] y los intervalos de entrada:
+
+\begin{figure}[H]
+\centering
+\label{ej4_3_0}
+\subfigure[intervalo a cubrir $(x,y)$ e intervalos de entrada]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_3_0.png}}\hspace{0.5in} 
+\setcounter{subfigure}{0}
+\end{figure}
+
+Las soluciones correspondientes a nuestro algoritmo y a MC son:
+
+\begin{figure}[H]
+\centering
+\label{ej4_3_1,2}
+\subfigure[solución que encuentra nuestro algoritmo]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_3_1.png}} \hspace{0.5in} 
+\subfigure[solución que encuentra MC]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_3_2.png} }\hspace{0.5in} 
+\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\setcounter{subfigure}{0}
+\end{figure}
+
+La solución que nuestro algoritmo encuentra es la óptima, sin embargo MC encuentra una solución con 3 intervalos. Esto es así porque cuando estaba eligiendo entre los intervalos a y b, MC incluyó a b en su solución, y siguió adelante con c y d (recordar que no se vuelve a decidir con intervalos ya antes vistos, pues se recorre la lista de intervalos de forma lineal y se va armando la solución).
+
+Veamos otro caso. Nuevamente tenemos el intervalo a cubrir [x,y] y los intervalos de entrada:
+
+\begin{figure}[H]
+\centering
+\label{ej4_4_0}
+\subfigure[intervalo a cubrir $(x,y)$ e intervalos de entrada]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_4_0.png}}\hspace{0.5in} 
+\setcounter{subfigure}{0}
+\end{figure}
+
+Las soluciones correspondientes a nuestro algoritmo y a MC son:
+
+\begin{figure}[H]
+\centering
+\label{ej4_4_1,2}
+\subfigure[solución que encuentra nuestro algoritmo]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_4_1.png}} \hspace{0.5in} 
+\subfigure[solución que encuentra MC]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_4_2.png} }\hspace{0.5in} 
+\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Nuestro algoritmo encuentra solución, pero MC no, porque MC ignora el intervalo que más cubre en la primera iteración. Por lo tanto nuestro algoritmo encontró una mejor solución.
+
+Por último, tenemos otro caso:
+
+\begin{figure}[H]
+\centering
+\label{ej4_5_0}
+\subfigure[intervalo a cubrir $(x,y)$ e intervalos de entrada]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_5_0.png}}\hspace{0.5in} 
+\setcounter{subfigure}{0}
+\end{figure}
+
+Las soluciones correspondientes a nuestro algoritmo y a MC son:
+
+\begin{figure}[H]
+\centering
+\label{ej4_5_1,2}
+\subfigure[solución que encuentra nuestro algoritmo]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_5_1.png}} \hspace{0.5in} 
+\subfigure[solución que encuentra MC]{
+\includegraphics[scale=0.5]{./graficos/ej4/ej4_5_2.png} }\hspace{0.5in} 
+\caption{Solución alternativa de igual cantidad de intervalos con MC}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Ninguno de los dos algoritmos encuentra solución, pues no la hay. No se puede cubrir el intervalo [x,y].
+
+En conclusión, nuestro algoritmo es igual o mejor que los demas (en cuanto a encontrar la mínima cantidad de intervalos que cubre [0,M]).
 
 El paso 3 nos asegura que el algoritmo termina, y que lo hace al cubrir el intervalo [0,M] o al encontrar un hueco dentro del mismo con los intervalos dados.
 
