@@ -27,3 +27,34 @@ Para cada caso de test en la entrada imprimir una línea conteniendo el número to
 \href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=10\&page=show\_problem\&problem=802}{Problema de Little Bishops}
 
 \subsection{Solución}
+
+Para la solución de este problema, se tuvo como idea de resolución una técnica de backtracking. La primera aproximación a la solución que surgió fue simplemente ir ubicando los alfiles uno por uno, en todas las combinaciones de posiciones (sin discriminar alfiles, es decir, la solucion en la que los alfiles $B_1$ y $B_2$ están ubicados en ciertas casillas es la misma solución con los alfiles permutados, por lo tanto solo consideramos una de ellas), podando aquellas ramas en las que dos alfiles se atacan entre sí. Si bien esta aproximación es correcta, tardaba mucho tiempo en devolver la solución.
+
+Utilizando esta aproximación a la solución, tenemos por fin disminuír el tiempo de ejecución del algoritmo. Para esto vamos a aprovechar una propiedad que es particular de los alfiles: si un alfil está posicionado en un casillero blanco entonces es imposible que se ataque con un alfil ubicado en un casillero negro. Entonces podemos ahorrar cálculos, dividiendo el problema en dos casos:
+
+\begin{itemize}
+\item $n$ es par: en este caso la cantidad de casilleros blancos es igual a la cantidad de casilleros negros. Por lo tanto la cantidad de formas en que uno puede ubicar $k_c$ alfiles es igual tanto para los casilleros blancos como para los negros. Llamemos $f:Nat×Nat \rightarrow Nat$ a la función tal que dada una cantidad $k_c$ de alfiles disponibles para ubicar en un color, y un $n$ que se corresponde con el n de la entrada, $f(k_c, n)$ devuelve la cantidad de formas en las que se puede ubicar $k_c$ alfiles en un solo color de un tablero de $n×n$. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ par es
+
+\medskip
+\medskip
+\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f(i, n) * f(k - i, n)$ }
+\medskip
+\medskip
+
+pues por cada forma de ubicar $i$ alfiles en un color, tenemos $f(k - i, n)$ formas de ubicar $k - i$ alfiles en el otro color.
+
+Entonces el algoritmo calcula $f(i, n)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
+
+\item $n$ es impar: en este caso la cantidad de casilleros blancos difiere en uno con la cantidad de casilleros negros. Usamos un cálculo similar al anterior. Llamemos $f_B:Nat×Nat \rightarrow Nat$ y $f_N:Nat×Nat \rightarrow Nat$ a las funciónes tales que dado un $n$ que se corresponde con el n de la entrada y una cantidad $k_c$ de alfiles disponibles para ubicar en un color, $f_B(k_c, n)$ y $f_N(k_c, n)$ devuelven la cantidad de formas en las que se puede ubicar $k_c$ alfiles en el color blanco y en el color negro, respectivamente, ambos para un tablero de $n×n$ casilleros. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ impar es
+
+\medskip
+\medskip
+\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f_B(i, n) * f_N(k - i, n)$ }
+\medskip
+\medskip
+
+pues por cada forma de ubicar $i$ alfiles en el color blanco, tenemos $f_N(k - i, n)$ formas de ubicar $k - i$ alfiles en el color negro.
+
+Entonces el algoritmo calcula $f_B(i, n)$ y $f_N(i, n)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
+
+\end{itemize}
