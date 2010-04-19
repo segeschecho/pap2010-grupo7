@@ -21,16 +21,43 @@ Para cada caso de test de la entrada, debe haber una salida correspondiente al n
 \href{http://uva.onlinejudge.org/index.php?option=com\_onlinejudge\&Itemid=8\&category=12\&page=show\_problem\&problem=1010}{Problema de Distinct Subsequences}
 
 \subsection{Solución}
-La solución al problema se divide en 2 etapas básicas:
+
+La solución al problema resulta ser iterativa sobre los caracteres de la palabra $X$ y de la palabra $Z$ y básicamente se divide en 2 etapas:
+
 \begin{itemize}
-\item Detectar los caracteres de la subsecuencia que aparecen en la secuencia. Esto se puede resolver simplemente iterando la secuencia y subsecuencia. Recorremos la subsecuencia de principio a fin, y la secuencia en el orden inverso.
-\item 
+\item Paso 1: consiste en recorrer la secuencia $X$ en busca de caracteres que coincidan con alguno de los caracteres en la subsecuencia $Z$. Dicho recorrido se realiza de fin a principio, y la razón para hacerlo de esta forma es que se pueden ir contando la cantidad de veces que se puede formar parte de $Z$ desde la ubicación actual de $X$ hasta el final de la misma. Esta idea la veremos un poco mas adelante con un ejemplo.
+\item Paso 2: una vez encontrado un caracter de $X$ que coincida con alguno dentro de $Z$ (llamémoslo $C$), el paso 2 se encarga de contar la cantidad de veces que se puede formar la sub palabra dentro de $Z$ que comience en $C$ y termine en el final de $Z$. Para hacer esto se tienen que tener en cuenta las letras que le siguen a $C$ en $Z$ y que hayan aparecido en $X$ en iteraciones anteriores (recordar que las iteraciones se realizan de fin a principio). La idea detrás de esto consiste en ver cuantas veces se puede formar la sub palabra comenzando en $C$ con las letras que ya se recorrieron.
 \end{itemize}
-Este problema se destaca particularmente de los demás debido a que los números (enteros) crecen rápidamente, hasta tener cientos de dígitos. Esto es así debido a la cantidad de distintas ocurrencias de Z en X, que como lo indica el enunciado, puede llegar a un orden de $10^{100}$. Los enteros en C++ tienen como máximo 8 bytes, es decir su máximo valor es $2^{64}$, o sea que no llega al orden de $10^{20}$, por lo tanto esto nos presenta un nuevo problema. Para esto creamos la clase VeryLongUnsignedInt, que representa enteros de una cantidad infinita de dígitos.
+
+Una vez descriptos los dos pasos básicos que realiza el algoritmo para resolver el problema, veremos un poco mas en detalle el paso 2, para explicar mejor como es que se hace para determinar cuantas veces se puede generar la sub palabra dentro de $Z$ y que comience en el caracter $C$ (que recordemos es el que coincide con el caracter actual en la iteración sobre $X$). El método consiste en asociar cada letra de $Z$ con un número, donde éste número representará la cantidad de veces que se puede formar la sub palabra que comience desde cada uno de los caracteres de $Z$ hasta el final de $Z$. Teniendo esto, por cada caracter que se encuentre en $X$ y que este contenido en $Z$, dicho caracter tendrá asociado la cantidad de veces que que se puede formar la sub secuencia comenzando en él, que resulta ser la cantidad que ya se tenia registrada anteriormente, pero sumándole ahora, la cantidad de veces que se puede generar la sub palabra que comienza con la letra inmediata siguiente. Esto se puede ver que es sensato de pensar, ya que si no se puede generar ninguna sub palabra desde el caracter inmediato siguiente a $C$, tampoco se podrá generar ninguna desde $C$ y si en cambio se puede generar alguna sub palabra desde el inmediato siguiente a $C$, entonces se pueden generar tantas subpalabras desde $C$ como haya desde el caracter inmediato siguiente. Para terminar de cerrar la idea veremos un ejemplo donde se aplica el paso 2.
+
+Veremos como funciona el paso 2 cuando se pueden generar sub palabras desde el caracter inmediato siguiente a $C$. Entonces para el siguiente ejemplo supongamos que se tiene una palabra $Z$ = ´bit´, y supongamos que se estuvo recorriendo $X$ que tiene ciertas palabras. Hasta el momento sabemos que se puede generar una sola vez la subsecuencia de $Z$ = ´it´, ya que se encontró primero una ´t´ y luego una ´i´ durante el recorrido de $X$, y entonces se hayan 3 ´b´s dentro de $X$.
+
+\begin{figure}[H]
+\centering
+\subfigure[inicio, se tiene que ya aparecio ´it´, donde primero aparecio ´t´ y luego ´i´(notar que si la aparicion hubiese sido al revéz, no se hubiese podido formar ´it´), por este motivo ´i´ tiene asociado un 1, ya que cuando apareció, sumó lo que tenia la letra inmediata siguiente ´t´]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso0.png}} \hspace{0.5in} 
+\subfigure[llega una ´b´, entonces existe una sola formar de formar ´bit´, que es con la única forma de hacer ´it´, por lo tanto se suma 1 al valor que se tenia en ´b´ (que es la cantidad de formas de formar ´bit´)]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso1.png} }\hspace{0.5in} 
+\subfigure[llega la segunda ´b´ y nuevamente existe solo una forma de formar ´bit´ con dicha letra, pero también se podia formar con la anterior ´b´ que había llegado, por ende al valor que se tenía en ´b´ (valor 1) se le suma la cantidad de formas de formar ´it´]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso2.png}} \hspace{0.5in} 
+\subfigure[llega la tercera ´b´, y aquí pasa lo mismo con los casos anteriores]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso3.png}} \hspace{0.5in} 
+\caption{resolución para el caso en donde se puede generar la sub palabra ´bit´}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Para un caso en donde no se pueda generar alguna sub palabra, queda claro que la letra inmediata siguiente tendrá valor cero, lo que significa que no se puede generar ninguna subpalabra que comience en dicha letra y termine en el final de $Z$.
+
+Como se puede observar, cada letra de $Z$ tiene asociado el valor que representa a la mayor cantidad de palabras que se pueden generar a partir de ella. De esta observación podemos decir entonces que cada valor asociado a las letras de $Z$ es óptimo respecto a dicha cantidad. Y entonces el cálculo que resulta de sumar el valor actual con el valor de la letra inmediata siguiente, resulta en un valor óptimo también, ya que se está seguro que no existen mas formas de generar la misma palabra. De esta forma, si vemos al problema como uno de programación dinámica podemos decir que el principio de óptimalidad se cumple en esta parte.
 
 \subsection{Detalles de implementación}
 
+Este problema se destaca particularmente de los demás debido a que los números (enteros) crecen rápidamente, hasta tener cientos de dígitos. Esto es así debido a la cantidad de distintas ocurrencias de $Z$ en $X$, que como lo indica el enunciado, puede llegar a un orden de $10^{100}$. Los enteros en C++ tienen como máximo 8 bytes, es decir su máximo valor es $2^{64}$, o sea que no llega al orden de $10^{20}$, por lo tanto esto nos presenta un nuevo problema, el de no poder contar la cantidad de subsecuencias si el número de ellas excede $2^{64}$. Para esto se creó una clase llamada VeryLongUnsignedInt, que representa enteros de una cantidad infinita de dígitos. Con esta implementación adicional se pudo contar entonces las sub secuencias que se encontraban y devolver el resultado correcto.
+
 \subsection{Cálculo de complejidad}
+
+A continuación se calculará la complejidad del algortimo que calcula la solución. Se hará en base a un pseudocódigo que representa la función resolver que dado una secuencia y una subsecuencia, calcula el numero de veces que dicha subsecuencia se encuentra dentro de la secuencia.
 
 \begin{algorithm}[H]
 \caption{Calcula la cantidad de ocurrencias de una subsecuencia en una secuencia}
@@ -38,7 +65,6 @@ Este problema se destaca particularmente de los demás debido a que los números (
 \begin{algorithmic}[1]
 \PARAMS{Secuencia, Subsecuencia}
 \STATE inicializar las Combinaciones para cada letra de la subsecuencia en 0
-\STATE longSubsec $\leftarrow$ largo de Subsecuencia
 \FOR{cada caracter C de la secuencia de fin a principio}
 	\FOR{cada caracter CSub de la subsecuencia tal que CSub $=$ C}
 		\IF{CSub es el último caracter de la Subsecuencia}
@@ -52,3 +78,11 @@ Este problema se destaca particularmente de los demás debido a que los números (
 \RETURN $Combinaciones_0$
 \end{algorithmic}
 \end{algorithm}
+
+Como la función recibe dos parámetros, la complejidad de dicha función queda determinada entonces por estos. Sea entonces $N$ el largo de la secuencia recibida y $L$ el largo de la subsecuencia, con éstos valores se demostrará la complejidad.
+
+La primer linea inicializa el vector donde se alojarán los valores relacionados con cada letra de la subsecuencia como se comentó previamente. Dicha inicialización tiene costo lineal con respecto al largo de la subsecuencia $L$.
+
+el primer ciclo de tipo $for$, recorre cada caracter de la secuencia desde el fin hasta el principio, por lo tanto, dicho ciclo iterará $N$ veces. El segundo ciclo $for$ recorre los caracteres de la subsecuencia para actualizar los valores que cada uno tiene relacionado(si coincide con el caracter actual de la secuencia), por esta razón, dicho ciclo iterará $L$ veces por cada iteración del primer $for$. Ahora entre las lineas $4$ y $9$ se actualiza el valor relacionado al caracter de la subsecuencia. Esto a simple vista es solo una suma y una asignación, pero en este caso, como se mencionó anteriormente, no se están utilizando enteros comunes, sino que son aquellos que se representan por la clase VeryLongUnsignedInt creada especialmente, y en esta clase una operacion del tipo $+=$ a lo sumo hace 9 iteraciones, ya que el número máximo de subsecuencias está acotado por $10^{100}$ y como en la implementación el número es guardado en un arreglo de $unsigned$ $long$ $long$ $int$, como máximo tenemos que podemos tener hasta 9 elementos en el arreglo, donde en cada iteración dentro de esta operacion se realizan operaciones de costo constante para calcular los carry. Luego podemos decir que las operaciones del tipo $+=$ se encuentran acotadas y podemos decir que tienen costo constante.
+
+Finalizando entonces, podemos ver que el costo de la función para hallar el valor buscado esta en el orden de los ciclos $for$ principales, osea en orden de $N*L$, que resulta ser la complejidad final.
