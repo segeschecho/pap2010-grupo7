@@ -33,28 +33,75 @@ Para la solución de este problema, se tuvo como idea de resolución una técnica d
 Utilizando esta aproximación a la solución, tenemos por fin disminuír el tiempo de ejecución del algoritmo. Para esto vamos a aprovechar una propiedad que es particular de los alfiles: si un alfil está posicionado en un casillero blanco entonces es imposible que se ataque con un alfil ubicado en un casillero negro. Entonces podemos ahorrar cálculos, dividiendo el problema en dos casos:
 
 \begin{itemize}
-\item $n$ es par: en este caso la cantidad de casilleros blancos es igual a la cantidad de casilleros negros. Por lo tanto la cantidad de formas en que uno puede ubicar $k_c$ alfiles es igual tanto para los casilleros blancos como para los negros. Llamemos $f:Nat×Nat \rightarrow Nat$ a la función tal que dada una cantidad $k_c$ de alfiles disponibles para ubicar en un color, y un $n$ que se corresponde con el n de la entrada, $f(k_c, n)$ devuelve la cantidad de formas en las que se puede ubicar $k_c$ alfiles en un solo color de un tablero de $n×n$. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ par es
+\item $n$ es par: en este caso la cantidad de casilleros blancos es igual a la cantidad de casilleros negros. Por lo tanto la cantidad de formas en que uno puede ubicar $k_c$ alfiles es igual tanto para los casilleros blancos como para los negros. Llamemos $f:Nat×Nat \rightarrow Nat$ a la función tal que dada una cantidad $k_c$ de alfiles disponibles para ubicar en un color, y un $n$ que se corresponde con el n de la entrada, $f(n, k_c)$ devuelve la cantidad de formas en las que se puede ubicar $k_c$ alfiles en un solo color de un tablero de $n×n$. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ par es
 
 \medskip
 \medskip
-\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f(i, n) * f(k - i, n)$ }
+\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f(n, i) * f(n, k - i)$ }
 \medskip
 \medskip
 
-pues por cada forma de ubicar $i$ alfiles en un color, tenemos $f(k - i, n)$ formas de ubicar $k - i$ alfiles en el otro color.
+pues por cada forma de ubicar $i$ alfiles en un color, tenemos $f(n, k - i)$ formas de ubicar $k - i$ alfiles en el otro color.
 
-Entonces el algoritmo calcula $f(i, n)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
+Entonces el algoritmo calcula $f(n, i)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
 
-\item $n$ es impar: en este caso la cantidad de casilleros blancos difiere en uno con la cantidad de casilleros negros. Usamos un cálculo similar al anterior. Llamemos $f_B:Nat×Nat \rightarrow Nat$ y $f_N:Nat×Nat \rightarrow Nat$ a las funciónes tales que dado un $n$ que se corresponde con el n de la entrada y una cantidad $k_c$ de alfiles disponibles para ubicar en un color, $f_B(k_c, n)$ y $f_N(k_c, n)$ devuelven la cantidad de formas en las que se puede ubicar $k_c$ alfiles en el color blanco y en el color negro, respectivamente, ambos para un tablero de $n×n$ casilleros. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ impar es
+\item $n$ es impar: en este caso la cantidad de casilleros blancos difiere en uno con la cantidad de casilleros negros. Usamos un cálculo similar al anterior. Llamemos $f_B:Nat×Nat \rightarrow Nat$ y $f_N:Nat×Nat \rightarrow Nat$ a las funciónes tales que dado un $n$ que se corresponde con el n de la entrada y una cantidad $k_c$ de alfiles disponibles para ubicar en un color, $f_B(n, k_c)$ y $f_N(n, k_c)$ devuelven la cantidad de formas en las que se puede ubicar $k_c$ alfiles en el color blanco y en el color negro, respectivamente, ambos para un tablero de $n×n$ casilleros. Entonces la cantidad total de formas en las que se pueden ubicar $k$ alfiles en un tablero de ajedrez de $n×n$, con $n$ impar es
 
 \medskip
 \medskip
-\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f_B(i, n) * f_N(k - i, n)$ }
+\centerline{ $cantSoluciones(n, k) = \sum_{i = 0}^k f_B(n, i) * f_N(n, k - i)$ }
 \medskip
 \medskip
 
-pues por cada forma de ubicar $i$ alfiles en el color blanco, tenemos $f_N(k - i, n)$ formas de ubicar $k - i$ alfiles en el color negro.
+pues por cada forma de ubicar $i$ alfiles en el color blanco, tenemos $f_N(n, k - i)$ formas de ubicar $k - i$ alfiles en el color negro.
 
-Entonces el algoritmo calcula $f_B(i, n)$ y $f_N(i, n)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
-
+Entonces el algoritmo calcula $f_B(n, i)$ y $f_N(n, i)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
 \end{itemize}
+
+Por último, para evitar hacer cálculos, sabemos que si $k > 2 * ( n - 1 )$ entonces la cantidad de formas en las que se pueden ubicar $k$ alfiles en un tablero de $n×n$ es \textbf{0}, pues en todo tablero de $n×n$ hay $2 * ( 2 * n - 1 )$ diagonales. Cada alfil ocupa dos diagonales, por lo tanto luego de ubicar el alfil número $2 * ( n - 1 )$ no hay forma de posicionar el siguiente alfil sin que se ataque con otro. Por lo tanto en este caso el algoritmo devuelve directamente \textbf{0}.
+
+A modo de aclaración, veamos unos ejemplos de cómo funciona el algoritmo:
+
+Supongamos que tenemos un tablero de 2x2 y debemos ubicar 2 alfiles:
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero2x2_0}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_0.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/alfil.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/alfil.png}\hspace{0.5in} 
+\caption{Tablero de ajedrez con n = 2 y k = 2}
+\end{figure}
+
+Por supuesto no se pueden ubicar 2 alfiles en el mismo color, por lo tanto $f(2, 2) = 0$, y las formas de ubicar 0 alfiles en un color es $f(2, 0) = 1$.
+
+Veamos que pasa con $f(2, 1)$:
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero2x2_1,2}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_1.png}\hspace{0.5in}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_2.png}\hspace{0.5in} 
+\caption{Ubicaciones de 1 alfil en un tablero de 2x2, para el color negro}
+\end{figure}
+
+Y como vemos en el siguiente grafico, la cantidad de formas de colocar un alfil en el color blanco es la misma que para el color negro, como explicamos antes
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero2x2_3,4}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_3.png}\hspace{0.5in}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_4.png}\hspace{0.5in} 
+\caption{Ubicaciones de 1 alfil en un tablero de 2x2, para el color blanco}
+\end{figure}
+
+Por lo tanto nuestro algoritmo hará el cálculo 
+\medskip
+\centerline{ $cantSoluciones(2, 2) = f(2, 0) * f(2, 2) + f(2, 1) * f(2, 1) + f(2, 2) * f(2, 0)$ }
+\centerline{ $cantSoluciones(2, 2) = 1 * 0 + 2 * 2 + 0 * 1$ }
+\centerline{ $cantSoluciones(2, 2) = 4$ }
+\medskip
+
+\subsection{Detalles de implementación}
+
+\subsection{Cálculo de complejidad}
