@@ -58,11 +58,11 @@ pues por cada forma de ubicar $i$ alfiles en el color blanco, tenemos $f_N(n, k 
 Entonces el algoritmo calcula $f_B(n, i)$ y $f_N(n, i)$ para $i = 0, ..., k$ haciendo backtracking como en la primera aproximación, y realiza la sumatoria.
 \end{itemize}
 
-Por último, para evitar hacer cálculos, sabemos que si $k > 2 * ( n - 1 )$ entonces la cantidad de formas en las que se pueden ubicar $k$ alfiles en un tablero de $n×n$ es \textbf{0}, pues en todo tablero de $n×n$ hay $2 * ( 2 * n - 1 )$ diagonales. Cada alfil ocupa dos diagonales, por lo tanto luego de ubicar el alfil número $2 * ( n - 1 )$ no hay forma de posicionar el siguiente alfil sin que se ataque con otro. Por lo tanto en este caso el algoritmo devuelve directamente \textbf{0}.
+Por último, para evitar hacer cálculos, sabemos que si $k > 2 * ( n - 1 )$ para $n > 1$ entonces la cantidad de formas en las que se pueden ubicar $k$ alfiles en un tablero de $n×n$ es \textbf{0}, pues en todo tablero de $n×n$ hay $2 * ( 2 * n - 1 )$ diagonales. Cada alfil ocupa dos diagonales, por lo tanto luego de ubicar el alfil número $2 * ( n - 1 )$ no hay forma de posicionar el siguiente alfil sin que se ataque con otro. Por lo tanto en este caso el algoritmo devuelve directamente \textbf{0}.
 
 A modo de aclaración, veamos unos ejemplos de cómo funciona el algoritmo:
 
-Supongamos que tenemos un tablero de 2x2 y debemos ubicar 2 alfiles:
+Supongamos que tenemos un tablero de $2×2$ y debemos ubicar 2 alfiles:
 
 \begin{figure}[H]
 \centering
@@ -96,12 +96,131 @@ Y como vemos en el siguiente grafico, la cantidad de formas de colocar un alfil 
 \end{figure}
 
 Por lo tanto nuestro algoritmo hará el cálculo 
+
 \medskip
 \centerline{ $cantSoluciones(2, 2) = f(2, 0) * f(2, 2) + f(2, 1) * f(2, 1) + f(2, 2) * f(2, 0)$ }
 \centerline{ $cantSoluciones(2, 2) = 1 * 0 + 2 * 2 + 0 * 1$ }
 \centerline{ $cantSoluciones(2, 2) = 4$ }
 \medskip
 
+Entonces la cantidad de formas de colocar 2 alfiles en un tablero de $2×2$ son \textbf{4}, que son:
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero2x2_5-8}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_5.png}\hspace{0.5in}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_6.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_7.png}\hspace{0.5in}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero2x2_8.png}\hspace{0.5in} 
+\caption{Ubicaciones de 2 alfiles en un tablero de 2x2}
+\end{figure}
+
+Supongamos ahora que tenemos un tablero de $3×3$ y queremos ubicar 3 alfiles:
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero3x3_0}
+\includegraphics[scale=0.5]{./graficos/ej2/tablero3x3_00.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/alfil.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/alfil.png}\hspace{0.5in} 
+\includegraphics[scale=0.5]{./graficos/ej2/alfil.png}\hspace{0.5in} 
+\caption{Tablero de ajedrez con n = 3 y k = 3}
+\end{figure}
+
+Nuestro algoritmo hará el siguiente cálculo:
+
+\medskip
+\centerline{ $cantSoluciones(3, 3) = f_N(3, 0) * f_B(3, 3) + f_N(3, 1) * f_B(3, 2) + f_N(3, 2) * f_B(3, 1) + f_N(3, 3) * f_B(3, 0)$ }
+\centerline{ $cantSoluciones(3, 3) = 1 * 0 + 4 * 4 + 5 * 2 + 1 * 0$ }
+\centerline{ $cantSoluciones(3, 3) = 26$ }
+\medskip
+
+Entonces la cantidad de formas de colocar 3 alfiles en un tablero de $3×3$ son \textbf{26}, que son:
+
+\begin{figure}[H]
+\centering
+\label{ej2_tablero3x3_1-26}
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_01.png}\hspace{0.5in}
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_02.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_03.png}\hspace{0.5in}
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_04.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_05.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_06.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_07.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_08.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_09.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_10.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_11.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_12.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_13.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_14.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_15.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_16.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_17.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_18.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_19.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_20.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_21.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_22.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_23.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_24.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_25.png}\hspace{0.5in} 
+\includegraphics[scale=0.2]{./graficos/ej2/tablero3x3_26.png}\hspace{0.5in} 
+\caption{Ubicaciones de 3 alfiles en un tablero de 3x3}
+\end{figure}
+
 \subsection{Detalles de implementación}
+El tablero no está explicitamente implementado en ninguna estructura. En su lugar utilizamos dos vectores booleanos, uno para las diagonales ascendentes y otro para las diagonales descendentes. Cada posición del vector es una diagonal y esta en true si la misma está ocupada y en false si no.
+
+Para decidir si una posición es segura (es decir, no es posición de ataque), se mantienen dos enteros correspondientes a la fila y columna de la posición en cuestión, y se indexa los vectores de diagonales ascendentes y descendentes con $fila + columna$ y $fila - columna + n - 1$ respectivamente. Es decir, la diagonal ascendente en la posición superior izquierda se corresponde con la posición $0$ del vector de diagonales ascendentes, y la diagonal ascendente en la posición inferior derecha se corrresponde con la posición $2 * n - 1$; la diagonal descendente en la posición superior derecha se corresponde con la posición $0$ del vector de diagonales descendentes, y la diagonal descendente en la posición inferior izquierda se corresponde con la posición $2 * n - 1$.
+
+En el modelo explicado describimos dos funciones principales: \textbf{cantSoluciones} y \textbf{f}. La primera se corresponde con \textbf{cantSoluciones} de la implementación, y la segunda con \textbf{solucionesUnColor}. Notar que solucionesUnColor, además de recibir por parámetro el $n$ y la cantidad de alfiles, recibe el color donde queremos ubicarlo, de modo que $solucionesUnColor(n, alfiles, Negro)$ es $f_N(n,alfiles)$ y $solucionesUnColor(n, alfiles, Blanco)$ es $f_B(n,alfiles)$.
 
 \subsection{Cálculo de complejidad}
+
+En esta sección se calculará la complejidad del algortimo que calcula la solución. Se hará en base a un pseudocódigo de las dos funciones principales: \textbf{cantSoluciones} y \textbf{solucionesUnColor}.
+
+A continuación, el pseudocódigo de la función cantSoluciones:
+
+\begin{algorithm}[H]
+\caption{Calcula la cantidad de formas de ubicar k alfiles en un tablero de nxn}
+\label{alg:algoritmo2_1}
+\begin{algorithmic}[1]
+\PARAMS{n, k}
+\IF{$k > 2 * ( n - 1 ) y n > 1$}
+	\RETURN $0$
+\ELSE
+	\STATE inicializar cantSoluciones en $0$
+	\IF{n es par}
+		\STATE \COMMENT{En la próxima línea es lo mismo calcular las soluciones para el color negro o para el blanco, por lo tanto elegimos negro de forma arbitraria}
+		\RETURN sumatoria de $solucionesUnColor(n, alfiles, color) * solucionesUnColor(n, k - alfiles, color)$, para $c = Negro$ y $alfiles = 0 ... k$
+	\ELSE
+		\RETURN sumatoria de $solucionesUnColor(n, alfiles, Negro) * solucionesUnColor(n, k - alfiles, Blanco)$, para $alfiles = 0 ... k$
+	\ENDIF
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
+
+A continuación, el pseudocódigo de la función solucionesUnColor:
+
+\begin{algorithm}[H]
+\caption{Calcula la cantidad de formas de ubicar un número de alfiles en un tablero de nxn, en el color c}
+\label{alg:algoritmo2_2}
+\begin{algorithmic}[1]
+\PARAMS{n, alfiles, c}
+\IF{$alfiles == 0$}
+	\RETURN $1$
+\ELSE
+	\STATE cantSoluciones $\leftarrow$ 0
+	\STATE \COMMENT{La primera llamada a la función supone no haber recorrido ninguna casilla, por lo que en la siguiente línea comenzará a iterar por la casilla superior izquierda}
+	\FOR{cada casilla del color c a partir de la siguiente en la que estaba al llamar esta función}
+		\IF{la casilla es segura}
+			\STATE ubicar un alfil en la casilla
+			\STATE cantSoluciones $\leftarrow$ cantSoluciones $+$ solucionesUnColor($n, alfiles - 1, c$)
+			\STATE quitar el alfil de la casilla
+		\ENDIF
+	\ENDFOR
+	\RETURN cantSoluciones
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
