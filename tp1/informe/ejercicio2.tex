@@ -187,10 +187,9 @@ A continuación, el pseudocódigo de la función cantSoluciones:
 \label{alg:algoritmo2_1}
 \begin{algorithmic}[1]
 \PARAMS{n, k}
-\IF{$k > 2 * ( n - 1 ) y n > 1$}
+\IF{$( k > 2 * ( n - 1 ) ) \wedge ( n > 1 )$}
 	\RETURN $0$
 \ELSE
-	\STATE inicializar cantSoluciones en $0$
 	\IF{n es par}
 		\STATE \COMMENT{En la próxima línea es lo mismo calcular las soluciones para el color negro o para el blanco, por lo tanto elegimos negro de forma arbitraria}
 		\RETURN sumatoria de $solucionesUnColor(n, alfiles, color) * solucionesUnColor(n, k - alfiles, color)$, para $c = Negro$ y $alfiles = 0 ... k$
@@ -224,3 +223,49 @@ A continuación, el pseudocódigo de la función solucionesUnColor:
 \ENDIF
 \end{algorithmic}
 \end{algorithm}
+
+Veamos primero la complejidad de solucionesUnColor que es la que hace el backtracking:
+
+Las líneas 1, 2, 3 y 4 tienen costo constante pues se trata de comparaciones y asignaciones de enteros.
+
+En la línea 6 comienza el ciclo encargado de recorrer las casillas del tablero. Dentro suyo tiene comparaciones de booleanos para ver si la casilla es segura y asignaciones que tienen costo constante. Además se llama recursivamente a solucionesUnColor para que ubique los alfiles restantes desde la próxima casilla.
+
+Por lo tanto en esta función, todo lo que no refiere al ciclo y a la llamada recursiva tiene costo constante. Veamos entonces cuantas veces se ejecuta esta función: llamemos $m = \left\lceil(n*n)/2\right\rceil$ a la cantidad máxima de casilleros del mismo color en un tablero de $n×n$. La función solucionesUnColor se llama recursivamente a lo sumo $m$ veces la primera vez, y en cada llamada recursiva ya hemos ubicado un alfil. Luego en la llamada recursiva se vuelve a llamar, pero $m - 1$ veces, por lo que en esta segunda llamada recursiva ya hemos ubicado 2 alfiles, y así hasta llegar a ubicar $b$ alfiles. Entonces ubicar un alfil en un color cuesta $m$ llamados, ubicar dos alfiles en un color cuesta $m(m-1)$ llamados, y así, ubicar $b$ alfiles en un color tiene un costo de:
+
+\medskip
+\medskip
+\centerline{ $m(m - 1)(m - 2)...(m - (b - 1)) = \displaystyle\frac{m!}{(m - b)!}$ }
+\medskip
+\medskip
+
+Notar que el $b$ utilizado es la cantidad de alfiles que se le envía por parámetro a la función solucionesUnColor.
+
+Visto ya el costo de esta función, veamos cuál es el costo de su llamador, que es \textbf{cantSoluciones}.
+
+Las líneas 1 y 2 tienen costo constante, porque son comparaciones y asignaciones de enteros.
+
+Notemos que el peor caso de esta función es cuando n es impar. En este caso, como lo indica la línea 8 del pseudocódigo, hay que ubicar los alfiles en los casilleros negros y en los casilleros blancos por separado. En cambio cuando n es par, solamente hay que ubicar los alfiles en un color, y esos resultados sirven también para el otro color.
+
+Por lo tanto veamos solamente el costo de la función cuando n es impar, ya que este caso es el que más afectará a la complejidad en peor caso: llamamos a solucionesUnColor dos veces, por cada una incrementando la cantidad de alfiles desde $0$ hasta $k$. Este costo es el siguiente:
+
+\medskip
+\medskip
+\centerline{ $\displaystyle	2*\sum_{i=0}^k \frac{m!}{(m - i)!} =$ }
+
+\medskip
+\centerline{ $\displaystyle	2*( 1 + \frac{m!}{(m - 1)!} + \frac{m!}{(m - 2)!} + ... + \frac{m!}{(m - k)!} ) =$ }
+
+\medskip
+\centerline{ $\displaystyle	2*( 1 + m + m( m - 1 ) + ... + m( m - 1 )( m - 2 )...( m - (k - 1) ) )$ }
+\medskip
+\medskip
+
+Entonces realizando estas cuentas, sabemos que el último término de esta sumatoria será el de mayor grado (pues tiene más términos multiplicando), por lo tanto es el que dominará el costo a medida que m crezca, por ende es el que define el orden de complejidad. Veamos entonces el último término:
+
+\medskip
+\medskip
+\centerline{ $\displaystyle	2* m( m - 1 )( m - 2 )...( m - (k - 1) ) $ }
+\medskip
+\medskip
+
+Y como vemos, estos son $k$ términos multiplicando, entonces el término de mayor grado será $2 * m^k = n^{2k}$, y como $k <= n^2$ entonces este término no crece asintóticamente más rápido que $n^{2n^2}$, y finalmente aseguramos que nuestro algoritmo que resuelve el problema tiene complejidad $\displaystyle O(n^{2n^2})$ en peor caso, siendo $n$ tal que el tablero es de $n×n$ casilleros.
