@@ -37,9 +37,9 @@ Veremos como funciona el paso 2 cuando se pueden generar sub palabras desde el c
 \centering
 \subfigure[inicio, se tiene que ya aparecio ´it´, donde primero aparecio ´t´ y luego ´i´(notar que si la aparicion hubiese sido al revéz, no se hubiese podido formar ´it´), por este motivo ´i´ tiene asociado un 1, ya que cuando apareció, sumó lo que tenia la letra inmediata siguiente ´t´]{
 \includegraphics[scale=0.5]{./graficos/ej3/paso0.png}} \hspace{0.5in} 
-\subfigure[llega una ´b´, entonces existe una sola formar de formar ´bit´, que es con la única forma de hacer ´it´, por lo tanto se suma 1 al valor que se tenia en ´b´ (que es la cantidad de formas de formar ´bit´)]{
+\subfigure[llega una ´b´, entonces existe una sola forma de formar ´bit´, que es con la única forma de hacer ´it´, por lo tanto se suma 1 al valor que se tenia en ´b´ (que es la cantidad de formas de formar ´bit´)]{
 \includegraphics[scale=0.5]{./graficos/ej3/paso1.png} }\hspace{0.5in} 
-\subfigure[llega la segunda ´b´ y nuevamente existe solo una forma de formar ´bit´ con dicha letra, pero también se podia formar con la anterior ´b´ que había llegado, por ende al valor que se tenía en ´b´ (valor 1) se le suma la cantidad de formas de formar ´it´]{
+\subfigure[llega la segunda ´b´ y nuevamente existe solo una forma de formar ´bit´ con dicha letra, pero también se podia formar con la anterior ´b´ que había llegado, por ende al valor que se tenía en ´b´ (valor 1) se le suma la cantidad de formas de formar ´it´, que es la cantidad de veces que se puede formar ´bit´ con la ´b´ actual]{
 \includegraphics[scale=0.5]{./graficos/ej3/paso2.png}} \hspace{0.5in} 
 \subfigure[llega la tercera ´b´, y aquí pasa lo mismo con los casos anteriores]{
 \includegraphics[scale=0.5]{./graficos/ej3/paso3.png}} \hspace{0.5in} 
@@ -47,9 +47,23 @@ Veremos como funciona el paso 2 cuando se pueden generar sub palabras desde el c
 \setcounter{subfigure}{0}
 \end{figure}
 
-Para un caso en donde no se pueda generar alguna sub palabra, queda claro que la letra inmediata siguiente tendrá valor cero, lo que significa que no se puede generar ninguna subpalabra que comience en dicha letra y termine en el final de $Z$.
+Para un caso en donde no se pueda generar alguna sub palabra, queda claro que la letra inmediata siguiente tendrá valor cero, lo que significa que no se puede generar ninguna subpalabra que comience en dicha letra y termine en el final de $Z$. A modo de ejemplo de este caso, veamos que pasa si ahora en $X$ se encuentra primero ´t´ pero no se encuentra ´i´ y llegan 2 ´b´s.
 
-Como se puede observar, cada letra de $Z$ tiene asociado el valor que representa a la mayor cantidad de palabras que se pueden generar a partir de ella. De esta observación podemos decir entonces que cada valor asociado a las letras de $Z$ es óptimo respecto a dicha cantidad. Y entonces el cálculo que resulta de sumar el valor actual con el valor de la letra inmediata siguiente, resulta en un valor óptimo también, ya que se está seguro que no existen mas formas de generar la misma palabra. De esta forma, si vemos al problema como uno de programación dinámica podemos decir que el principio de óptimalidad se cumple en esta parte.
+\begin{figure}[H]
+\centering
+\subfigure[inicio, se tiene que ya aparecio ´t´, por este motivo ´i´ tiene asociado un 0 ya que no apareció ninguna ´i´ para intentar formar ´it´]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso0ej2.png}} \hspace{0.5in} 
+\subfigure[llega una ´b´, entonces no existe forma de formar ´bit´, ya que no ha llegado una ´i´, por este motivo, la cantidad de veces que se puede formar ´bit´ es la misma para formar ´it´, y que resulta ser 0, este es el valor que quedará en ´b´)]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso1ej2.png} }\hspace{0.5in} 
+\subfigure[llega la segunda ´b´ y nuevamente no existe forma de formar ´bit´ con dicha letra]{
+\includegraphics[scale=0.5]{./graficos/ej3/paso2ej2.png}} \hspace{0.5in} 
+\caption{resolución para el caso en donde se puede generar la sub palabra ´bit´}
+\setcounter{subfigure}{0}
+\end{figure}
+
+Como se puede observar, cada letra de $Z$ tiene asociado el valor que representa a la mayor cantidad de palabras que se pueden generar a partir de ella. De esta observación podemos decir entonces que cada valor asociado a las letras de $Z$ es óptimo respecto a dicha cantidad. Y entonces el cálculo que resulta de sumar el valor actual con el valor de la letra inmediata siguiente, resulta en un valor óptimo también, ya que se está seguro que no existen mas formas de generar la misma palabra. De esta manera, si vemos al problema como uno de programación dinámica podemos decir que el principio de óptimalidad se cumple en esta parte.
+
+Por otro lado podemos decir que, el valor a devolver como solución del problema, será el valor que se encuentre en la primer letra de $Z$, ya que este indicará la cantidad de veces que se puede formar $Z$ en $X$.
 
 \subsection{Detalles de implementación}
 
