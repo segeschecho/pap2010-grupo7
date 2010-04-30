@@ -8,6 +8,7 @@ typedef unsigned int uint;
 typedef unsigned long long int ullint;
 typedef long long int llint;
 typedef uint Nodo;
+typedef vector< vector< llint > > Matriz;
 
 inline uint min( uint a, uint b ) { return a > b ? b : a; }
 inline uint max( uint a, uint b ) { return a > b ? a : b; }
@@ -24,15 +25,15 @@ class ULLInt
 public:
     // Constructores
     //-----------------------------------------------------------------------------------
-    ULLInt(){ mInfinite = true; }
-    ULLInt( ullint valor ){ mInfinite = false; mEntero = valor; }
+    ULLInt() : mInfinite ( true ) {};
+    ULLInt( ullint valor ) : mInfinite( false ), mEntero( valor ){};
 
     // Operadores básicos
     //-----------------------------------------------------------------------------------
     void operator=( ullint valor ) { mInfinite = false; mEntero = valor; }
     void operator=( const ULLInt& int2 ) { mInfinite = int2.mInfinite; mEntero = int2.mEntero; }
-    bool operator>( const ULLInt& int2 ) const { if( !mInfinite && !int2.mInfinite ){ return mEntero > int2.mEntero; } return mInfinite && !int2.mInfinite; }
-    ULLInt operator+( ullint valor ) const { if( !mInfinite ) { return mEntero + valor; } return ULLInt(); }
+    bool operator>( const ULLInt& int2 ) const { return ( !mInfinite && !int2.mInfinite ) ? mEntero > int2.mEntero : mInfinite && !int2.mInfinite; }
+    ULLInt operator+( ullint valor ) const { return !mInfinite ? mEntero + valor : ULLInt(); }
 
     // Observadores
     //-----------------------------------------------------------------------------------
@@ -62,16 +63,9 @@ class Red
 public:
 
     //-----------------------------------------------------------------------------------
-    // Clase Eje
-    class Eje
+    // Eje
+    struct Eje
     {
-    public:
-        Eje( Nodo fuente, Nodo destino )
-        {
-            mFuente = fuente;
-            mDestino = destino;
-        }
-
         Nodo mFuente;
         Nodo mDestino;
     };
@@ -80,48 +74,18 @@ public:
 
     // Constructor y destructor
     //-----------------------------------------------------------------------------------
-    Red( uint cantidadNodos )
+    Red( uint cantidadNodos ) :
+        mListaAdyacencias( cantidadNodos ), 
+        mCostoEje( cantidadNodos, vector< llint >( cantidadNodos ) ),
+        mFlujoEje( cantidadNodos, vector< llint >( cantidadNodos ) )
     {
-        mListaAdyacencias.resize( cantidadNodos );
-        mCostoEje = new ullint* [ cantidadNodos ];
-        for( uint i = 0; i < cantidadNodos; i++ )
-        {
-            mCostoEje[ i ] = new ullint [ cantidadNodos ];
-            for( uint j = 0; j < cantidadNodos; j++ )
-            {
-                mCostoEje[ i ][ j ] = 0;
-            }
-        }
-
-        mFlujoEje = new llint* [ cantidadNodos ];
-        for( uint i = 0; i < cantidadNodos; i++ )
-        {
-            mFlujoEje[ i ] = new llint [ cantidadNodos ];
-            for( uint j = 0; j < cantidadNodos; j++ )
-            {
-                mFlujoEje[ i ][ j ] = 0;
-            }
-        }
     }
 
-    ~Red()
-    {
-        for( uint i = 0; i < mListaAdyacencias.size(); i++ )
-        {
-            delete mCostoEje[ i ];
-        }
-        delete mCostoEje;
-
-        for( uint i = 0; i < mListaAdyacencias.size(); i++ )
-        {
-            delete mFlujoEje[ i ];
-        }
-        delete mFlujoEje;
-    }
+    ~Red(){}
 
     //-----------------------------------------------------------------------------------
     // agrega al grafo un eje dirigido de nodo1 -> nodo2 con costo y flujo
-    void agregarEje( Nodo nodo1, Nodo nodo2, ullint costo, llint flujo = 0 )
+    void agregarEje( Nodo nodo1, Nodo nodo2, llint costo, llint flujo = 0 )
     {
         Nodo ultimoNodo = mListaAdyacencias.size() - 1;
         if( nodo1 > ultimoNodo || nodo2 > ultimoNodo )
@@ -129,7 +93,10 @@ public:
             mListaAdyacencias.resize( max( nodo1, nodo2 ) + 1 );
         }
 
-        mListaAdyacencias[ nodo1 ].push_back( Eje( nodo1, nodo2 ) );
+        Eje nuevoEje;
+        nuevoEje.mDestino = nodo1;
+        nuevoEje.mFuente = nodo2;
+        mListaAdyacencias[ nodo1 ].push_back( nuevoEje );
         mCostoEje[ nodo1 ][ nodo2 ] = costo;
         mFlujoEje[ nodo1 ][ nodo2 ] = flujo;
     }
@@ -151,12 +118,12 @@ public:
     }
 
     //-----------------------------------------------------------------------------------
-    ullint getCostoEje( Nodo fuente, Nodo destino )
+    llint getCostoEje( Nodo fuente, Nodo destino )
     {
         return mCostoEje[ fuente ][ destino ];
     }
 
-    ullint getCostoEje( const Eje& eje )
+    llint getCostoEje( const Eje& eje )
     {
         return mCostoEje[ eje.mFuente ][ eje.mDestino ];
     }
@@ -188,10 +155,10 @@ protected:
     vector< VEje > mListaAdyacencias;
 
     // matriz de costo de cada eje
-    ullint** mCostoEje;
+    Matriz mCostoEje;
 
     // matriz de flujo de cada eje
-    llint** mFlujoEje;
+    Matriz mFlujoEje;
 
     // capacidad de los ejes
     ullint mCapacidadEjes;
@@ -326,10 +293,8 @@ private:
 
             return aumento;
         }
-        else
-        {
-            return -1;
-        }
+
+        return -1;
     }
 
     //-----------------------------------------------------------------------------------
@@ -342,7 +307,7 @@ private:
     void buscarCaminoMinimo( Nodo s, vector< pair< ULLInt, ULLInt > >& resultado )
     {
         uint cantNodos = mRed->getCantNodos();
-        ullint capacidadEjes = mRed->getCapacidadEjes();
+        llint capacidadEjes = mRed->getCapacidadEjes();
 
         if( resultado.size() < cantNodos )
         {
@@ -362,8 +327,17 @@ private:
                 {
                     const ULLInt& distanciaFuente = resultado[ eje->mFuente ].second;
                     const ULLInt& distanciaDestino = resultado[ eje->mDestino ].second;
-                    ullint costoEje = mRed->getCostoEje( *eje );
                     llint flujoEje = mRed->getFlujoEje( *eje );
+
+                    ullint costoEje;
+                    if( flujoEje >= 0 )
+                    {
+                        costoEje = mRed->getCostoEje( *eje );
+                    }
+                    else
+                    {
+                        costoEje = -mRed->getCostoEje( *eje );
+                    }
                     if( flujoEje < capacidadEjes && distanciaDestino > distanciaFuente + costoEje )
                     {
                         resultado[ eje->mDestino ].second = distanciaFuente + costoEje;
@@ -386,36 +360,22 @@ private:
     Red* mRed;
 };
 
-// FIXME: Borrar este método y hacer todo directamente en main
-int dataflow( istream& entrada, ostream& salida )
+int main()
 {
-    for( TestCase testActual; entrada >> testActual; )
+    for( TestCase testActual; cin >> testActual; )
     {
         llint resultado = testActual.resolver();
         if( resultado >= 0 )
         {
-            salida << resultado;
+            cout << resultado;
         }
         else
         {
-            salida << "Impossible.";
+            cout << "Impossible.";
         }
 
-        salida << endl;
+        cout << endl;
     }
 
     return 0;
-}
-
-int main()
-{
-    ifstream in( "test01", ios_base::in );
-    ofstream out( "test01Out", ios_base::out );
-
-    int ret = dataflow( in, out );
-
-    in.close();
-    out.close();
-
-    return ret;
 }
