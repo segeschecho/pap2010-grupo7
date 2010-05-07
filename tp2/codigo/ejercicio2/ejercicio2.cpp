@@ -16,7 +16,7 @@ void operator +=(horaReloj& h1, horaReloj& h2){
     //sumo los minutos
     h1.second += h2.second;
     //me fijo si se paso de 60
-    if (h1.second > 60){
+    if (h1.second >= 60){
         int temp = h1.second;
         h1.second = temp % 60;
         h1.first += temp / 60;
@@ -25,10 +25,29 @@ void operator +=(horaReloj& h1, horaReloj& h2){
     //sumo las horas
     h1.first += h2.first;
     //me fijo si se paso de 24
-    if(h1.first > 24){
+    if(h1.first >= 24){
         int temp = h1.first;
         h1.first = temp % 24;
     }
+}
+
+//h1 mas grande que h2
+horaReloj& operator -(horaReloj& h1, horaReloj& h2) {
+    int minutos = 0;
+    int horas = 0;
+    horaReloj res;
+
+    if(h2.second > h1.second){
+        minutos = 60 + (h1.second - h2.second);
+        horas -= 1;
+    }
+    else
+        minutos = h1.second - h2.second;
+
+    horas = horas + h1.first - h2.first;
+    res = pair<int, int>(horas, minutos);
+
+    return res;
 }
 
 bool operator <(horaReloj& h1, horaReloj& h2) {
@@ -39,7 +58,28 @@ bool operator <(horaReloj& h1, horaReloj& h2) {
 }
 
 ostream& operator<<(ostream& os, horaReloj& h){
-    os << h.first << ":" << h.second;
+
+    os << h.first << ":";
+    if(h.second < 10)
+        os << "0" << h.second;
+    else
+        os << h.second;
+
+    return os;
+}
+
+void mostrarHorario(ostream& os, horaReloj& h){
+    if(h.first < 10)
+        os << "0" << h.first;
+    else
+        os << h.first;
+
+    os << ":";
+
+    if(h.second < 10)
+        os << "0" << h.second;
+    else
+        os << h.second;
 }
 
 //-----------------------------------------------------------------------------------
@@ -68,11 +108,11 @@ class Eje
             return d;
         }
 
-        horaReloj tiempoViaje(){
+        horaReloj& tiempoViaje(){
             return tViaje;
         }
 
-        horaReloj horarioSalida(){
+        horaReloj& horarioSalida(){
             return hSalida;
         }
 
@@ -99,8 +139,7 @@ class TestCase{
         for(int ruta = 0; ruta < rutas; ruta++){
             //horario representa la hora en que va a pasar el tren en cada estacion
             horaReloj horario;
-            horario.first = 0;
-            horario.second = 0;
+            horario = horaReloj(0,0);
 
             //tengo la estacion anterior a la actual
             int estacionAnterior;
@@ -109,7 +148,7 @@ class TestCase{
             int estaciones;
             is >> estaciones;
 
-            cout << "estaciones: " << estaciones << endl;
+            //cout << "estaciones: " << estaciones << endl;
 
             //primero guardo la estacion inicial del recorrido
             if(estaciones > 0){
@@ -118,13 +157,17 @@ class TestCase{
                 //cargo la hora en formato horaReloj
                 t.obtenerHora(is, hora);
 
+                if(hora < t.horarioSalidaSoloUnNodo){
+                    t.horarioSalidaSoloUnNodo = hora;
+                }
+
                 //actualizo el horario
                 horario = hora;
-                cout << "sale: " << hora.first << ":" << hora.second;
-                cout << " horario: " << horario.first << ":" << horario.second;
+                //cout << "sale: " << hora;
+                //cout << " horario: " << horario;
 
                 is >> ciudad;
-                cout << " " << ciudad << endl;
+                //cout << " " << ciudad << endl;
 
                 //cargo la info del nodo inicial
                 //me fijo si la cuidad ya esta
@@ -140,6 +183,7 @@ class TestCase{
                 else{
                     //sino esta, agrego el nodo a las estructuras
                     t.tiempos.push_back(pair <horaReloj, bool>(INF, false));
+                    t.horariosLlegada.push_back(horaReloj());
                     //le asigno un numero a la ciudad
                     t.ciudadNodo[ciudad] = numeroNodo;
                     //agrego la hora del tren que pasa por la ciudad
@@ -160,7 +204,7 @@ class TestCase{
 
                 //obtengo la ciudad
                 is >> ciudad;
-                cout << " " << ciudad << endl;
+                //cout << " " << ciudad << endl;
 
                 //guardo la informacion y voy armando el grafo
                 //me fijo si la ciudad ya esta
@@ -180,6 +224,7 @@ class TestCase{
                 else{
                     //sino esta, agrego el nodo a las estructuras
                     t.tiempos.push_back(pair<horaReloj, bool>(INF, false));
+                    t.horariosLlegada.push_back(horaReloj());
                     //le asigno un numero a la ciudad
                     t.ciudadNodo[ciudad] = numeroNodo;
 
@@ -214,7 +259,7 @@ class TestCase{
         t.destino = t.ciudadNodo[destino];
 
         //muestro para ver que anda
-        for (int i = 0; i < numeroNodo; i++){
+/*        for (int i = 0; i < numeroNodo; i++){
             //muestro los adyacentes
             cout << "adyacentes de: " << i;
             for (int j = 0; j < t.listaAdy[i].size(); j++){
@@ -235,13 +280,15 @@ class TestCase{
         for (int i = 0; i < numeroNodo; i++){
             cout << t.tiempos[i].first.first << " " << t.tiempos[i].first.second << endl;
         }
-
+*/
 
         return is;
     }
 
 public:
-    TestCase(){};
+    TestCase(){
+        horarioSalidaSoloUnNodo = horaReloj(24, 0);
+    }
 
     void resolver(){
         //hacemos dijkstra para cada uno de las ciudades vecinas al origen
@@ -250,64 +297,191 @@ public:
         //marcamos el origen como recorrido
         tiempos[origen].second = true;
 
+        if(destino == origen){
+            horaReloj min = listaAdy[origen][0].horarioSalida();
+
+            if(adyacentesOrigen > 0){
+                for(int i = 0; i < adyacentesOrigen; i++){
+                    if(listaAdy[origen][i].horarioSalida() < min)
+                        min = listaAdy[origen][i].horarioSalida();
+                }
+                mostrarHorario(cout, min);
+                cout << " " << "0:00" << endl;
+            }
+            else{
+                mostrarHorario(cout, horarioSalidaSoloUnNodo);
+                cout << " " << "0:00" << endl;
+            }
+            return;
+        }
+
         for(int adyOrigen = 0; adyOrigen < adyacentesOrigen; adyOrigen++){
+            vector <int> tocados;
             //nodo con el que comienzo dijktra
             int nodoActual = listaAdy[origen][adyOrigen].destino();
             int adyacentesActual = listaAdy[nodoActual].size();
 
+            bool hayMas = true;
+
             //menor tiempo hasta el momento
             horaReloj tiempoTotal;
 
-            //nodo al que se pasara en la siguiente iteracion
-            int nodoMenor;
-            int posNodoMenor;
-            horaReloj tiempoMenor;
-
             tiempoTotal = listaAdy[origen][adyOrigen].tiempoViaje();
 
-            while(adyacentesActual > 0 and nodoActual != destino){
-                //inicializo el tiempo menor
-                tiempoMenor = INF;
+            tiempos[nodoActual].first = tiempoTotal;
+            tiempos[nodoActual].second = true;
 
+            horariosLlegada[nodoActual] = listaAdy[origen][adyOrigen].horarioSalida();
+            horariosLlegada[nodoActual] += tiempoTotal;
+
+            tocados.push_back(nodoActual);
+
+            while(hayMas){
                 for(int adyActual = 0; adyActual < adyacentesActual; adyActual++){
                     Eje ejeAdyActual = listaAdy[nodoActual][adyActual];
                     int nodoAdy = ejeAdyActual.destino();
 
                     if(!tiempos[nodoAdy].second){
                         //si el nodo no se recorrio
-                        horaReloj temp = ejeAdyActual.tiempoViaje();
-                        temp += tiempoTotal;
+                        horaReloj dif;
 
-                        if(temp < tiempos[nodoAdy].first){
-                            //si es menor la distancia, entonces actualizo la dist
-                            tiempos[nodoAdy].first = temp;
-                        }
+                        diferencia(horariosLlegada[nodoActual], ejeAdyActual.horarioSalida(), dif);
+                        //cout << "diferencia: " << horariosLlegada[nodoActual] << " - " << ejeAdyActual.horarioSalida() << " es "<< dif << endl;
+                        dif += ejeAdyActual.tiempoViaje();
 
-                        //me fijo si es el siguiente nodo
-                        if(tiempos[nodoAdy].first < tiempoMenor){
-                            tiempoMenor = tiempos[nodoAdy].first;
-                            nodoMenor = nodoAdy;
-                            posNodoMenor = nodoAdy;
+                        if(dif < tiempos[nodoAdy].first){
+                            //si es menor el tiempo para llegar, entonces actualizo
+                            tiempos[nodoAdy].first = dif;
+                            tiempos[nodoAdy].first += tiempos[nodoActual].first;
+
+                            //cout << "sumado: " << dif << " + " << tiempos[nodoActual].first << endl;
+
+                            horariosLlegada[nodoAdy] = ejeAdyActual.horarioSalida();
+                            horariosLlegada[nodoAdy] += ejeAdyActual.tiempoViaje();
+
                         }
+                        tocados.push_back(nodoAdy);
                     }
                 }
 
-                //actualizo el tiempo total
-                horaReloj temp = listaAdy[nodoActual][posNodoMenor].tiempoViaje();
-                tiempoTotal += temp;
                 //indico cual es el siguiente nodo
-                nodoActual = nodoMenor;
+                nodoActual = buscarMinimoNoTachado();
+
+                if(nodoActual == -1){
+                    hayMas = false;
+                    break;
+                }
+
+                //actualizo el tiempo total
+                tiempoTotal = tiempos[nodoActual].first;
+
                 adyacentesActual = listaAdy[nodoActual].size();
+/*                cout << "tiempo total: " << tiempoTotal << endl;
+                cout << "nodo: " << nodoActual << endl;
+                cout << "adyacentes: " << adyacentesActual << endl;
+*/
+                //marco el nodo como recorrido
+                tiempos[nodoActual].second = true;
             }
 
-            horaReloj temp = listaAdy[origen][adyOrigen].horarioSalida();
-            cout << temp << " ";
-            cout << "tiempo: " << tiempoTotal << endl;
+            //muestro horario de salida
+            horaReloj salida = listaAdy[origen][adyOrigen].horarioSalida();
+            //cout << salida << " ";
+            //cout << "tiempo: " << tiempos[destino].first << endl;
+
+            //actualizo los resultados, con horario salida
+            map<horaReloj ,pair<horaReloj, bool> > :: iterator it;
+            it = resultadosSalida.find(salida);
+
+            if(it != resultadosSalida.end()){
+                if(tiempos[destino].first < it->second.first){
+                    it->second.first = tiempos[destino].first;
+                }
+            }
+            else{
+                resultadosSalida[salida] = pair<horaReloj, bool>(tiempos[destino].first, false);
+            }
+
+            //con horario llegada
+            map<horaReloj ,vector < horaReloj > > :: iterator itera2;
+            itera2 = resultadosLlegada.find(horariosLlegada[destino]);
+
+            if(itera2 != resultadosLlegada.end()){
+                //si esta el horario de llegada, guardo el horario de salida
+                itera2->second.push_back(salida);
+            }
+            else{
+                vector < horaReloj > vec;
+                vec.push_back(salida);
+                resultadosLlegada[horariosLlegada[destino]] = vec;
+                todosHorariosLLegada.push_back(horariosLlegada[destino]);
+            }
+
+            //desmarco los nodos tocados
+            for(int i = 0; i < (int)tocados.size(); i++){
+                int nodo = tocados[i];
+                tiempos[nodo].first = INF;
+                tiempos[nodo].second = false;
+            }
+        }
+
+        //filtro por horario de llegada
+        for (int i = 0; i < todosHorariosLLegada.size(); i++){
+            horaReloj tempHora = todosHorariosLLegada[i];
+            vector < horaReloj > tempVec = resultadosLlegada[tempHora];
+            horaReloj horaMasGrande = tempVec[0];
+
+            for(int j = 0; j < tempVec.size(); j++){
+                horaReloj tempSalida = tempVec[j];
+
+                if(horaMasGrande < tempSalida){
+                    horaMasGrande = tempSalida;
+                }
+            }
+
+            resultadosSalida[horaMasGrande].second = true;
+        }
+
+        //filtro resultados por horario de salida
+        for(int i = 0; i < adyacentesOrigen; i++){
+            horaReloj hora = listaAdy[origen][i].horarioSalida();
+            //si todavia no mostre con ese horario de salida
+            if(resultadosSalida[hora].second){
+                mostrarHorario(cout, hora);
+                cout  << " " << resultadosSalida[hora].first << endl;
+                //como ya lo mostre lo pongo en falso
+                resultadosSalida[hora].second = false;
+            }
         }
     }
 
     ~TestCase(){};
 private:
+    //------------------------------------------------------------------------------
+    void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res){
+        if (h1 < h2){
+            res = h2 - h1;
+        }
+        else{
+            horaReloj hora24 = horaReloj(24,0);
+            res = hora24 - h1;
+            res += h2;
+        }
+    }
+    //------------------------------------------------------------------------------
+    int buscarMinimoNoTachado(){
+        int res = -1;
+        horaReloj min = INF;
+
+        for(int i = 0; i < (int)tiempos.size(); i++){
+            if(tiempos[i].first < min && !tiempos[i].second){
+                min = tiempos[i].first;
+                res = i;
+            }
+        }
+        return res;
+    }
+
     //------------------------------------------------------------------------------
     void obtenerHora(istream& is, horaReloj& hora){
         string horaString;
@@ -333,6 +507,14 @@ private:
 
     //arreglo que tendra los tiempos minimos y si esta marcado
     vector < pair< horaReloj, bool > > tiempos;
+    //horario de llegada a cada nodo
+    vector< horaReloj > horariosLlegada;
+    //resultados
+    map < horaReloj, pair< horaReloj , bool > > resultadosSalida;
+    map < horaReloj, vector< horaReloj > > resultadosLlegada;
+    vector< horaReloj > todosHorariosLLegada;
+    //para el caso en que hay solo un nodo
+    horaReloj horarioSalidaSoloUnNodo;
 
 };
 
@@ -345,7 +527,7 @@ int main()
     while (cantCasos > 0){
         TestCase test;
 
-        cout << "cargando test" << endl;
+        //cout << "cargando test" << endl;
         cin >> test;
 
         //viene resolver
