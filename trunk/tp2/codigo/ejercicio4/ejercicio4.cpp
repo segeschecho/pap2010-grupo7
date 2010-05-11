@@ -237,62 +237,52 @@ public:
         }
 
         res.second = -1;
+
+        // matrizMayoresPesos[i][j] representa el peso del eje que tiene
+        // mayor valor en esa variable en el camino del nodo i al nodo j
+        vector< vector< uint > > matrizMayoresPesos( n );
+        for( Nodo nodo = 0; nodo < n; nodo++ )
+        {
+            matrizMayoresPesos[ nodo ] = buscarMayoresPesos( nodo, mst );
+        }
+
+        // Ahora pruebo de agregar ejes que no estan en el mst y sacar ejes que si estan
         for( vector< Grafo::Arista >::iterator a = aristasRestantes.begin(); a < aristasRestantes.end(); a++ )
         {
-            res.second = res.second == -1 ? buscarMstAgregando( *a, mst, res.first ) : min( res.second, buscarMstAgregando( *a, mst, res.first ) );
+            int pesoNuevoST = res.first + a->w - matrizMayoresPesos[ a->vi ][ a->vj ];
+            res.second = res.second == -1 ? pesoNuevoST : min( pesoNuevoST, res.second );
         }
         return res;
     }
 
 private:
-    int buscarMstAgregando( Grafo::Arista& aristaAgregada, const GrafoAdyacentes& g, int valorMst ) const
-    {
-        int res = -1;
-        vector< Grafo::Arista > camino( buscarCamino( aristaAgregada.vi, aristaAgregada.vj, g ) );
-        for( vector< Grafo::Arista >::iterator a = camino.begin(); a < camino.end(); a++ )
-        {
-            res = res == -1 ? valorMst + aristaAgregada.w - a->w : min( res, valorMst + aristaAgregada.w - a->w );
-        }
 
-        return res;
-    }
-
-    vector< Grafo::Arista > buscarCamino( Nodo nodo1, Nodo nodo2, const GrafoAdyacentes& g ) const
+    // Este metodo hace un bfs desde nodo, guardando para cada
+    // camino desde nodo cual fue el eje de mayor peso
+    vector< uint > buscarMayoresPesos( Nodo nodo, const GrafoAdyacentes& g )
     {
         uint n = g.getCantNodos();
-        vector< Nodo > predecesor( n );
+        vector< uint > mayorPeso( n, 0 );
 
         vector< Nodo > cola;
-        for( Nodo i = 0; i < n; i++ )
-        {
-            if( i == nodo1 )
-            {
-                cola.push_back( i );
-            }
-            predecesor[ i ] = i;
-        }
+        cola.push_back( nodo );
 
-        for( uint i = 0; i < n && predecesor[ nodo2 ] == nodo2; i++ )
+        vector< bool > visitado( n, false );
+        for( uint cantVisitados = 0; cantVisitados < n; cantVisitados++ )
         {
-            const vector< Grafo::Arista >& aristasActual = g.getAristas( cola[ i ] );
+            const vector< Grafo::Arista >& aristasActual = g.getAristas( cola[ cantVisitados ] );
             for( vector< Grafo::Arista >::const_iterator a = aristasActual.begin(); a < aristasActual.end(); a++ )
             {
-                if( predecesor[ a->vj ] == a->vj && a->vj != nodo1 )
+                if( !visitado[ a->vj ] )
                 {
+                    mayorPeso[ a->vj ] = max( a->w, mayorPeso[ a->vi ] );
                     cola.push_back( a->vj );
-                    predecesor[ a->vj ] = a->vi;
                 }
+                visitado[ cola[ cantVisitados ] ] = true;
             }
         }
 
-        vector< Grafo::Arista > res;
-        for( uint i = nodo2; i != nodo1; )
-        {
-            res.push_back( Grafo::Arista( predecesor[ i ], i, g.getCostoArista(predecesor[ i ], i) ) );
-            i = predecesor[ i ];
-        }
-
-        return res;
+        return mayorPeso;
     }
 
 protected:
