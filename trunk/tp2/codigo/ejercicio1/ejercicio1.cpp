@@ -1,3 +1,5 @@
+#define FILEINPUT
+
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -29,15 +31,29 @@ public:
     TestCase(){};
     ~TestCase(){};
 
+    bool valido()
+    {
+        return mValido;
+    }
+
     pair< int, int > resolver()
     {
         uint filas = hayPared.size();
         uint columnas = hayPared[ 0 ].size();
 
-        Vvvvbool expandi( filas, Vvvbool( columnas, Vvbool( filas, Vbool( columnas, false ) ) ) );
+        Vvvvbool visite( filas, Vvvbool( columnas, Vvbool( filas, Vbool( columnas, false ) ) ) );
         vector< Nodo > cola;
 
-        cola.push_back( Nodo( mCasInicialCaja, mCasInicial ) );
+        for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
+        {
+            Casillero casVecinoCaja = casilleroVecino( mCasInicialCaja, d );
+            int pasos = moverme( mCasInicial, casVecinoCaja, mCasInicialCaja );
+            if( pasos >= 0 )
+            {
+                visite[ casVecinoCaja.first ][ casVecinoCaja.second ][ casVecinoCaja.first ][ casVecinoCaja.second ] = true;
+                cola.push_back( Nodo(mCasInicialCaja, casVecinoCaja, pasos) );
+            }
+        }
         uint numNodoActual = 0;
 
         // mientras que aun hayan acciones por realizar y la caja no esta en el destino
@@ -48,17 +64,15 @@ public:
             Casillero pC = nodoActual.pC;
             Casillero pK = nodoActual.pK;
 
-            // si no expandi el nodo actual
-            if( !expandi[ pC.first ][ pC.second ][ pK.first ][ pK.second ] )
+            for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
             {
-                for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
+                Nodo nuevoNodo = adyacente( nodoActual, d );
+                if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] && \
+                    !visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] )
                 {
-                    Nodo nuevoNodo = moverme( nodoActual, d );
-                    if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] )
-                        cola.push_back( moverme( nodoActual, d ) );
+                    cola.push_back( adyacente( nodoActual, d ) );
+                    visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = true;
                 }
-
-                expandi[ pC.first ][ pC.second ][ pK.first ][ pK.second ] = true;
             }
 
             numNodoActual++;
@@ -71,69 +85,85 @@ public:
         return pair< int, int >( cola[ numNodoActual ].p, cola[ numNodoActual ].e );
     }
 
-    bool valido()
+    int moverme( Casillero ci, Casillero cf, Casillero casCaja )
     {
-        return mValido;
+        if( hayPared[ cf.first ][ cf.second] )
+        {
+            return -1;
+        }
+
+        uint filas = hayPared.size();
+        uint columnas = hayPared[ 0 ].size();
+
+        Vvbool visite( Vvbool( filas, Vbool( columnas, false ) ) );
+        vector< pair< Casillero, uint > > cola;
+
+        cola.push_back( pair< Casillero, uint >( ci, 0 ) );
+        visite[ cola[ 0 ].first.first ][ cola[ 0 ].first.second ] = true;
+        uint i = 0;
+
+        // mientras que aun me pueda mover y no estoy en el destino
+        while( i < cola.size() && cola[ i ].first != cf )
+        {
+            for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
+            {
+                Casillero nuevoCasillero = casilleroVecino( cola[ i ].first, d );
+                if( !hayPared[ nuevoCasillero.first ][ nuevoCasillero.second ] && nuevoCasillero != casCaja && 
+                    !visite[ nuevoCasillero.first ][ nuevoCasillero.second ] )
+                {
+                    cola.push_back( pair< Casillero, uint >( nuevoCasillero, cola[ i ].second + 1 ) );
+                    visite[ nuevoCasillero.first ][ nuevoCasillero.second ] = true;
+                }
+            }
+
+            i++;
+        }
+
+        if( i == cola.size() )
+        {
+            return -1;
+        }
+        return cola[ i ].second;
     }
 
-    bool puedoMoverme( Nodo n , Direccion d )
+    Casillero casilleroVecino( Casillero c, Direccion d )
     {
-        Nodo nuevoNodo = moverme( n, d );
-        if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] )
-            return true;
-        return false;
-    }
-
-    Nodo moverme( Nodo n , Direccion d )
-    {
-        uint filaK = n.pK.first, columnaK = n.pK.second, filaC = n.pC.first, columnaC = n.pC.second;
-        uint nuevaFilaK = filaK, nuevaColK = columnaK, nuevaFilaC = filaC, nuevaColC = columnaC;
-        uint empujo = 0;
+        uint fila = c.first, columna = c.second;
+        uint nuevaFila = fila, nuevaCol = columna;
 
         switch( d )
         {
         case IZQUIERDA:
-            nuevaColK = columnaK - 1;
-            // si la caja estaba a mi izquierda supongo que la caja se va a mover
-            if( nuevaFilaK == filaC && nuevaColK == columnaC )
-            {
-                nuevaColC = columnaC - 1;
-                empujo = 1;
-            }
+            nuevaCol = columna - 1;
             break;
 
         case DERECHA:
-            nuevaColK = columnaK + 1;
-            // si la caja estaba a mi derecha supongo que la caja se va a mover
-            if( nuevaFilaK == filaC && nuevaColK == columnaC )
-            {
-                nuevaColC = columnaC + 1;
-                empujo = 1;
-            }
+            nuevaCol = columna + 1;
             break;
 
         case ARRIBA:
-            nuevaFilaK = filaK - 1;
-            // si la caja estaba arriba mio supongo que la caja se va a mover
-            if( nuevaFilaK == filaC && nuevaColK == columnaC )
-            {
-                nuevaFilaC = filaC - 1;
-                empujo = 1;
-            }
+            nuevaFila = fila - 1;
             break;
 
         case ABAJO:
-            nuevaFilaK = filaK + 1;
-            // si la caja estaba abajo mio supongo que la caja se va a mover
-            if( nuevaFilaK == filaC && nuevaColK == columnaC )
-            {
-                nuevaFilaC = filaC + 1;
-                empujo = 1;
-            }
+            nuevaFila = fila + 1;
             break;
         };
 
-        return Nodo( Casillero( nuevaFilaC, nuevaColC ), Casillero( nuevaFilaK, nuevaColK ), n.p + 1, n.e + empujo );
+        return Casillero( nuevaFila, nuevaCol );
+    }
+
+    Nodo adyacente( Nodo n , Direccion d )
+    {
+        Casillero nuevoCasilleroK = casilleroVecino( n.pK, d ), nuevoCasilleroC = n.pC;
+        uint empujo = 0;
+        if ( nuevoCasilleroK == n.pC )
+        {
+            nuevoCasilleroC = casilleroVecino( n.pC, d );
+            empujo = 1;
+        }
+
+        return Nodo( nuevoCasilleroC, nuevoCasilleroK, n.p + 1, n.e + empujo );
     }
 
     // casillero inicial de la caja
@@ -157,18 +187,26 @@ istream& operator>>( istream& is, TestCase& t )
     if( is >> filas )
     {
         is >> columnas;
-        if( filas == 0 || columnas == 0 )
+        if( filas == 0 && columnas == 0 )
         {
             t.mValido = false;
             return is;
         }
 
         // ignoro el caracter de '\n' que hay luego del k
+#ifdef FILEINPUT
         is.ignore();
+#else
+        getchar();
+#endif
+
         // FIXME: ARREGLAR ESTO EN EL MOMENTO DE LA ENTREGA PARA QUE SEA GETCHAR
+#ifdef FILEINPUT
         char c = is.peek();
         is.ignore();
-
+#else
+        char c = getchar();
+#endif
         // el filas + 2 y columnas + 2 es para agregarle una pared alrededor
         t.hayPared = vector< vector< bool > > ( filas + 2, vector< bool >( columnas + 2, true ) );
 
@@ -179,8 +217,12 @@ istream& operator>>( istream& is, TestCase& t )
             {
                 if( c == '\n' )
                 {
+#ifdef FILEINPUT
                     c = is.peek();
                     is.ignore();
+#else
+                    c = getchar();
+#endif
                 }
 
                 switch( c )
@@ -208,8 +250,12 @@ istream& operator>>( istream& is, TestCase& t )
                     break;
                 };
 
+#ifdef FILEINPUT
                 c = is.peek();
                 is.ignore();
+#else
+                c = getchar();
+#endif
             }
         }
     }
@@ -217,14 +263,16 @@ istream& operator>>( istream& is, TestCase& t )
     return is;
 }
 
-#define FILEINPUT
-
 int main()
 {
 #ifdef FILEINPUT
 
     ifstream entrada( "test", ios_base::in );
     ofstream salida( "testOut", ios_base::out );
+#else
+    istream& entrada = cin;
+    ostream& salida = cout;
+#endif
 
     int numTest = 1;
     bool testValido = true;
@@ -239,40 +287,17 @@ int main()
 
             salida << "Instancia " << numTest << endl;
             if( res.first >= 0 )
-                salida << res.first << " " << res.second << endl << endl;
+                salida << res.first << " " << res.second << endl;
             else
-                salida << "Impossivel" << endl << endl;
+                salida << "Impossivel" << endl;
+
+            salida << endl;
 
             numTest++;
         }
     }
-
+#ifdef FILEINPUT
     salida.close();
     entrada.close();
-
-#else
-
-    int numTest = 1;
-    bool testValido = true;
-    while( testValido )
-    {
-        TestCase testActual;
-        cin >> testActual;
-        testValido = testActual.valido();
-        if( testValido )
-        {
-            pair< int, int > res = testActual.resolver();
-
-            cout << "Instancia " << numTest << endl;
-            if( res.first >= 0 )
-                cout << res.first << " " << res.second << endl << endl;
-            else
-                cout << "Impossivel" << endl << endl;
-
-            numTest++;
-        }
-    }
-
 #endif
-    return 0;
 }
