@@ -1,4 +1,4 @@
-#define FILEINPUT
+//#define FILEINPUT
 
 #include <iostream>
 #include <vector>
@@ -8,10 +8,14 @@ using namespace std;
 typedef unsigned int uint;
 typedef pair< uint, uint > Casillero;
 
-typedef vector< bool > Vbool;
-typedef vector< Vbool > Vvbool;
-typedef vector< Vvbool > Vvvbool;
-typedef vector< Vvvbool > Vvvvbool;
+typedef pair< uint, uint > Puiui;
+
+typedef vector< Puiui > Vpuiui;
+typedef vector< Vpuiui > Vvpuiui;
+typedef vector< Vvpuiui > Vvvpuiui;
+typedef vector< Vvvpuiui > Vvvvpuiui;
+
+#define INFINITO 0xFFFFFFFF
 
 enum Direccion{ ARRIBA, DERECHA, ABAJO, IZQUIERDA };
 
@@ -41,49 +45,57 @@ public:
         uint filas = hayPared.size();
         uint columnas = hayPared[ 0 ].size();
 
-        Vvvvbool visite( filas, Vvvbool( columnas, Vvbool( filas, Vbool( columnas, false ) ) ) );
+        Vvvvpuiui visite( filas, Vvvpuiui( columnas, Vvpuiui( filas, Vpuiui( columnas, Puiui(INFINITO, INFINITO) ) ) ) );
         vector< Nodo > cola;
 
-        for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
-        {
-            Casillero casVecinoCaja = casilleroVecino( mCasInicialCaja, d );
-            int pasos = moverme( mCasInicial, casVecinoCaja, mCasInicialCaja );
-            if( pasos >= 0 )
-            {
-                visite[ casVecinoCaja.first ][ casVecinoCaja.second ][ casVecinoCaja.first ][ casVecinoCaja.second ] = true;
-                cola.push_back( Nodo(mCasInicialCaja, casVecinoCaja, pasos) );
-            }
-        }
+        cola.push_back( Nodo(mCasInicialCaja, mCasInicial) );
+        visite[ mCasInicialCaja.first ][ mCasInicialCaja.second ][ mCasInicial.first ][ mCasInicial.second ] = Puiui( 0, 0 );
+
         uint numNodoActual = 0;
+        uint empujonesMejorSol = INFINITO;
+        uint pasosMejorSol = INFINITO;
 
         // mientras que aun hayan acciones por realizar y la caja no esta en el destino
-        while( numNodoActual < cola.size() && cola[ numNodoActual ].pC != mGoal )
+        while( numNodoActual < cola.size() )
         {
             Nodo nodoActual = cola[ numNodoActual ];
 
             Casillero pC = nodoActual.pC;
             Casillero pK = nodoActual.pK;
 
-            for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
+            if( pC == mGoal && ( nodoActual.e < empujonesMejorSol || ( nodoActual.e == empujonesMejorSol && nodoActual.p < pasosMejorSol ) ) )
             {
-                Nodo nuevoNodo = adyacente( nodoActual, d );
-                if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] && \
-                    !visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] )
+                empujonesMejorSol = nodoActual.e;
+                pasosMejorSol = nodoActual.p;
+            }
+            else
+            {
+                for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
                 {
-                    cola.push_back( adyacente( nodoActual, d ) );
-                    visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = true;
+                    Nodo nuevoNodo = adyacente( nodoActual, d );
+                    uint menorCantPasos = visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].first;
+                    uint menorCantEmpujones = visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].second;
+
+                    if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] && \
+                        ( nuevoNodo.e < menorCantEmpujones || ( nuevoNodo.e == menorCantEmpujones && nuevoNodo.p < menorCantPasos ) ) && \
+                        ( nuevoNodo.e < empujonesMejorSol || ( nuevoNodo.e == empujonesMejorSol && nuevoNodo.p < pasosMejorSol ) ) )
+                    {
+                        cola.push_back( nuevoNodo );
+                        visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = Puiui( nuevoNodo.p, nuevoNodo.e );
+                    }
                 }
             }
 
             numNodoActual++;
         }
 
-        if( numNodoActual == cola.size() )
+        if( pasosMejorSol == INFINITO && empujonesMejorSol == INFINITO )
         {
             return pair< int, int >( -1, -1 );
         }
-        return pair< int, int >( cola[ numNodoActual ].p, cola[ numNodoActual ].e );
+        return pair< int, int >( pasosMejorSol, empujonesMejorSol );
     }
+/*
 
     int moverme( Casillero ci, Casillero cf, Casillero casCaja )
     {
@@ -95,7 +107,7 @@ public:
         uint filas = hayPared.size();
         uint columnas = hayPared[ 0 ].size();
 
-        Vvbool visite( Vvbool( filas, Vbool( columnas, false ) ) );
+        Vvpuiui visite( Vvpuiui( filas, Vpuiui( columnas, false ) ) );
         vector< pair< Casillero, uint > > cola;
 
         cola.push_back( pair< Casillero, uint >( ci, 0 ) );
@@ -125,6 +137,7 @@ public:
         }
         return cola[ i ].second;
     }
+*/
 
     Casillero casilleroVecino( Casillero c, Direccion d )
     {
@@ -267,8 +280,8 @@ int main()
 {
 #ifdef FILEINPUT
 
-    ifstream entrada( "test", ios_base::in );
-    ofstream salida( "testOut", ios_base::out );
+    ifstream entrada( "testImpossivel", ios_base::in );
+    ofstream salida( "testImpossivelOut", ios_base::out );
 #else
     istream& entrada = cin;
     ostream& salida = cout;
