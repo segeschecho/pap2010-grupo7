@@ -8,7 +8,6 @@ En el laboratorio de IIUC, se requiere enviar una enorme cantidad de datos desde
 \centering
 \label{ejEnunciado_dataflow}
 \includegraphics[scale=0.8]{./graficos/ej3/ejEnunciado.png}
-\caption{Capacidad de los enlaces = 10}
 \end{figure}
 
 Por ejemplo, en esta red si alguien quiere enviar 20 unidades de datos desde A a D, enviará 10 unidades de datos a través del enlace AD y luego 10 unidades de datos a través del enlace AB-BD, lo que tomará 10+70=80 unidades de tiempo.
@@ -27,8 +26,30 @@ Para cada test,  imprimir en una línea el mínimo tiempo posible  para enviar tod
 
 \subsection{Modelo}
 
+El modelo corresponde a un problema de flujo máximo de costo mínimo, donde la red se representa mediante un grafo dirigido \textbf{G = (V, E)}, de forma tal que cada nodo $v_i \in$ \textbf{V} para $i = 1,2,...,N$ (el \textbf{N} del enunciado) representa un servidor en la red, y un eje $e = (v_i, v_j, w, f, c) \in$ \textbf{E} si hay un link entre los servidores representados por $v_i$ y $v_j$ que tiene un costo de w unidades de tiempo y contiene flujo f y capacidad c, con $f \leq c$. El grafo del modelo tendrá 2M ejes, siendo \textbf{M} el del enunciado.
+
 \subsection{Solución}
 
+Dado el input construimos G y computamos Ford-Fulkerson y Bellman-Ford sobre él.
+
+El grafo residual no se calcula, sino que se realiza todo en G que tendrá ejes de costo positivo y ejes de costo negativo, de forma que cada link de $v_1$ a $v_2$ se representa mediante dos ejes: un eje $(v_1, v_2, w, f, c)$ y otro eje $(v_1, v_2, w, -f, c)$. Sin embargo durante la ejecución de Bellman-Ford, consideramos que cuando el flujo de un eje es negativo, el mismo abarata el costo total (resta al costo total del camino) y si es positivo lo encarece (suma al costo total del camino).
+\begin{itemize}
+\item	Ford-Fulkerson: sirve para calcular el flujo máximo de una red. Necesita un G con ejes con capacidades c, un nodo fuente s y un sumidero t. El G es construido del input, y el s y t son dados (el nodo 1 y el nodo N respectivamente).
+
+\item	Bellman-Ford: dado que en el problema existen ejes negativos, no podemos usar Dijkstra, por lo tanto optamos por usar Bellman-Ford para buscar caminos de aumento en el grafo residual (que está dentro de nuestro G). Como en el grafo original los ejes tienen costo positivo, no se generan ciclos de costo negativo. Por lo tanto las precondiciones de Bellman-Ford se cumplen. Para poder pasar flujo por un eje se tiene que cumplir que $f < c$, por lo tanto al realizar Bellman-Ford solo tenemos en cuenta tales ejes como posibles candidatos a formar parte de un camino de aumento (pues tales ejes no pertenecen al grafo residual). Recibe dos parámetros: el nodo desde donde se calcula la menor distancia a todos los demás, y el grafo, y devuelve las distancias a todos los demás nodos. Lo ejecutamos entonces en cada paso de Ford-Fulkerson enviándole el grafo G y el nodo fuente s y luego aumentamos el flujo de los ejes del camino en c (la capacidad de los links) y restamos c al flujo de los ejes del camino en sentido contrario.
+Este algoritmo efectivamente resuelve el problema, dado que por lo visto en clase, si cada camino de aumento que buscamos es de costo mínimo respecto de los caminos de aumento disponibles, entonces el flujo resultante es de costo mínimo.
+\end{itemize}
 \subsection{Detalles de implementación}
 
+Implementamos una clase \textbf{Red} que sería el grafo con ejes con costo y flujo. Dado el problema y nuestra solución concluimos que todos los ejes tienen la misma capacidad, por lo tanto Red mantiene una variable para la capacidad de todos los ejes del grafo. Un eje está compuesto de un nodo fuente y otro destino. Para los costos y flujos se mantienen dos matrices para poder consultar y asignar el costo y flujo de un eje en tiempo constante. Se mantiene además una lista de adyacencias.
+
+Se implementó una clase \textbf{ULLInt} (Unsigned Long Long Int) que representa los enteros y el valor infinito. Esto lo hicimos para poder inicializar las distancias a los demás nodos a infinito en el algoritmo de Bellman-Ford. Esta clase tiene implementados los operadores de suma y comparación por mayor, de forma que $infinito > entero$ resulta verdadero, pero $infinito > infinito$ no.
+
+Se implementó una clase \textbf{TestCase} que es la más importante, pues es la responsable de resolver el problema. Contiene la implementación de Ford-Fulkerson (resolver) y Bellman-Ford (buscarCaminoMinimo).
+
 \subsection{Cálculo de complejidad}
+
+Bellman-Ford en peor caso es $O( NM )$ siendo \textbf{N} la cantidad de nodos y \textbf{M} la cantidad de ejes con un grafo implementado sobre listas de adyacencia.
+Durante Ford-Fulkerson, cada vez que aumentamos el flujo lo hacemos en una magnitud c, siendo c la capacidad de los ejes, a excepción de la última iteración del algoritmo, que aumenta el flujo en $k mod c$, siendo k la cantidad de flujo a enviar. Por lo tanto Ford-Fulkerson itera $c/k$ veces.
+Luego para finalizar calculamos el tiempo total empleado recorriendo todos los ejes del grafo y sumando $costo*flujo$ para aquellos ejes de $flujo > 0$. Esto tiene costo $O( M )$.
+Concluimos que el algoritmo completo tiene complejidad $O( \frac{c*N*M}{k} + M ) \leq O( \frac{c*N*M}{k} )$
