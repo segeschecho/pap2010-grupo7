@@ -1,0 +1,78 @@
+\chapter{Problema 1}
+
+\section{1759 - Cubo}
+
+\subsection{Enunciado}
+
+En un futuro no muy lejano las personas buscarán juegos cada vez más peligrosos
+para jugar. Después de ultra-ligeros y el bungee-jumping las personas necesitan
+juegos donde sus actividades mentales también se pongan a prueba. Este es el
+caso del juego llamado 'cubo', inventado en Nueva Zelanda. En algunos lugares
+también es conocido por su nombre japonés: sokoban.
+
+Considere un laberinto de dos dimensiones compuesto de casillas cuadradas, donde
+cada una está libre o está ocupada por una piedra. En cada paso, puede salir de
+una casilla y moverse a otra casilla vecina (es decir, arriba, abajo, izquierda y
+derecha) libre. Usted está ocupando una de las casillas libres de este laberinto.
+
+\begin{figure}[H]
+\centering
+\label{ej1_sokoban}
+\includegraphics[scale=0.8]{./graficos/ej1/sokoban.jpg}
+\caption{Ejemplo del juego}
+\end{figure}
+
+Una casilla del laberinto contiene una pila de cajas. La pila puede ser movida 
+de una casilla i a una casilla k (por ejemplo, k = i+1), vecina de i, en la
+dirección ik si usted estuviera en la casilla j (aquí j = i-1), vecina de i, y
+la dirección ik es igual a la dirección ji. Una caja no puede ser movida de
+ninguna otra manera (es decir, no se puede tirar de la caja). Así que si la
+caja termina en una esquina del laberinto no podrá moverla nuevamente.
+Por último, tenga en cuenta que en cada empujón de la caja usted da un paso, y
+que lo inverso no es necesariamente cierto.
+
+Una de las casillas vacías está marcada como la casilla final. Su tarea es
+llevar la caja a la casilla final a través de una serie de pasos y empujones de
+la caja. Como la caja es pesada, quiere realizar el menor número posible de
+empujones de la caja.
+
+Tenga en cuenta que en el juego de la vida real existe la posibilidad de que
+pueda ser aplastado por la caja, haciendo que todo mucho más divertido.
+
+\textbf{Input:}
+
+El archivo de entrada se compone de varias instancias. Cada instancia se inicia
+con una línea que contiene dos entero r y c (ambos menores o iguales que 20) que
+representando el número de filas y columnas del laberinto.
+
+Luego se les proporcionan r líneas, cada una con c caracteres. Cada caracter
+describe una casilla del laberinto. Una casilla ocupada por una piedra se indica
+por \# y una casilla vacía está representada por un '.' (sin las comillas). Su
+posición de partida se indica con S, la posición inicial de la caja está indicada
+por B y la posición final de la caja se indica por el T.
+
+La entrada termina cuando r = c = 0.
+
+\textbf{Output:}
+
+Para cada laberinto, imprima en primer lugar el número de instancia, como se
+muestra en la salida de ejemplo siguiente. Si no es posible llevar el cuadro
+a su posición final, escriba una línea conteniendo 'Impossivel'.
+De lo contrario, deberá imprimir dos enteros x e y, donde x indica el número
+de movimientos (pasos + empujones) e y el numero de empujones de una secuencia
+que hace que lleve la cada hasta la posición final. El número de empujones debe
+ser mínimo. Si hay más de una posible secuencia que utiliza un número mínimo de
+empujes, el número total de movimientos debe ser mínimo.
+Imprima una línea en blanco después de cada instancia.
+
+\textbf{Url:}
+
+\href{https://br.spoj.pl/problems/CUBO/}{Problema de cubo}
+
+\subsection{Modelo}
+
+\subsection{Solución}
+
+\subsection{Detalles de implementación}
+
+\subsection{Cálculo de complejidad}
