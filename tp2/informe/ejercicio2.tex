@@ -1,0 +1,42 @@
+\chapter{Problema 2}
+
+\section{10362 - Trains}
+
+Los trenes son fantásticos. Puedes ir a donde quieras en tren, en europa, incluyendo pueblos pequeños. En Canada, el servicio de trenes no es muy bueno. A veces hay que cambiar de tren muchas veces y a menudo es difícil de saber cual es la ruta más rápida, y donde realizar los cambios. Dependiendo de la hora del día, la ruta puede pasar por ciudades completamente diferentes. Afortunadamente, tu puedes escribir un programa para ayudar con esta tarea. Dados los horarios de los trenes recorriendo diferentes ciudades, tu tarea es encontrar todas las conexiones mas cortas entre dos lugares. Una conexión es mas corta que otra si no hay otra conexión que pueda dejarte salir mas tarde y llegar a la misma hora o mas temprano, o que saliendo al a misma hora llegue mas temprano o a la misma hora de llegada. Los tiempos de cambiar de tren no necesitan ser considerados, que se encuentran calculados dentro de los horarios.
+
+\begin{figure}[H]
+\centering
+\label{ej2_trenes}
+\includegraphics[scale=0.4]{./graficos/ej2/trains.jpg}
+\end{figure}
+
+\textbf{Entrada:}
+
+La primer línea de entrada contiene un número positivo $N$, que indica el número de casos de test. La primer línea de cada caso de test contiene $T \le 20$ número de líneas de trenes. Cada línea de tren es descripta por una o mas líneas conteniendo:
+
+\begin{itemize}
+\item El número $S$ de estaciones en la línea de tren $S \le 20$, incluyendo el origen y el destino.
+\item La hora de salida hh:mm del tren desde la primer estación (en notación de 24hs, es decir en el rango de  00:00 a 23:59). Se puede asumir que un tren deja la estación de origen a la misma hora todos los días.
+\item Una lista de nombres de las estaciones $S$, separadas por el tiempo de viaje entre las estaciones adyacentes. El tiempo de viaje es dado en horas y minutos.
+\end{itemize}
+
+
+Finalmente, cada caso de test da el nombre de una ciudad origen y destino para las cuales se tiene que armar un horario. Se puede asumir que hay al menos una ruta de la ciudad de origen hasta la ciudad destino.
+
+\textbf{Salida:}
+
+La salida consiste en una lista de las conexiones mas cortas desde el origen hasta el destino, indicando la hora de salida y el tiempo de viaje para cada una. Ordenadas por horario de salida. Cada horario de salida debe estar listado solo una vez si hay mas de una ruta con el mismo horario.
+
+Los horarios de salida deben ser dados como $hh:mm$ (es decir exactamente 2 dígitos en cado parte). El tiempo de viaje debe ser dado como $h:mm$, $hh:mm$, $hhh:mm$, etc. Se debe dejar una línea en blanco entre los resultados de cada caso de test.
+
+\textbf{Url:}
+
+\href{http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&category=15&problem=1303}{Problema de Trains}
+
+\subsection{Modelo}
+
+\subsection{Solución}
+
+\subsection{Detalles de implementación}
+
+\subsection{Cálculo de complejidad}

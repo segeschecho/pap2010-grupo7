@@ -1,0 +1,69 @@
+\chapter{Problema 4}
+
+\section{10600 - ACM Contest and Blackout}
+
+Con el motivo de preparar el 'Primer concurso nacional de escuelas ACM' el alcalde de la ciudad decidió proveer a todas las escuelas de una fuente de energía confiable. Por este motivo, la fuente de energía 'Future' y una escuela (no importa cual) debe estar conectada;  además algunas escuelas tienen que estar conectadas.
+
+Se puede asumir que una escuela tiene una fuente de energía confiable, si ésta está conectada directamente a 'Future', o a alguna de las escuelas que tienen una fuente de energía confiable. Se le da el costo de conexión entre algunas escuelas. El alcalde ha decidido tomar los 2 planes mas baratos -el costo de la conexión es igual a la suma de las conexiones entre las escuelas. Tu tarea es ayudar al alcalde -encontrando el costo de las 2 conexiones mas bataras.
+
+\textbf{Input:}
+
+El input comienza con el número de casos de tests $T$ ($1 \le T \le 15$) en una línea. Seguido de eso, vienen $T$ casos de tests. La primer línea de cada test contiene 2 números, que se encuentran separados por un espacio. $N$ ($3 \le N \le 100$) es el número de escuelas en la ciudad y $M$ el número de posibles conexiones  entre ellas. Seguido de esto, vienen $M$ líneas conteniendo 3 números en cada una $A_i, B_i, C_i$, donde $C_i$ es el costo de la conexión ($1 \le Ci \le 300$) entre las escuelas $A_i$ y $B_i$. Las escuelas se encuentran numeradas dentro del rango de 1 a N.
+
+\textbf{Output:}
+
+Para cada caso de test solo se devuelve una línea de output. Esta línea debe contener dos números separados por un único espacio -el costo de los 2 planes de conexión mas baratos. Sea $S1$ el costo mas barato y S2 el siguiente costo mas barato. $S1 = S2$ si y solo si los dos planes mas baratos tienen el mismo costo, de otra forma $S1 < S2$. Se puede asumir que siempre es posible obtener los costos $S1$ y $S2$.
+
+\textbf{Url:}
+
+\href{http://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&category=18&page=show_problem&problem=1541}{Problema de ACM Contest and Blackout}
+
+\subsection{Modelo}
+
+Para éste problema se realizó un modelo basado en grafos. El mismo se corresponde de manera exacta con la descripción del problema. Cada uno de los nodos del grafo representa una de las escuelas ingresadas en el problema. Además cada par de éstos, se encuentra unido por una arista si y solo es posible realizar una conexión entre las escuelas que ambos representan. Las aristas contienen un costo, y es el relacionado al costo de la conexión entre las 2 escuelas.
+
+De esta forma, modelar el problema, resulta en un pasaje lineal entre las escuelas y los nodos del grafo, y entre las conexiones y las aristas del mismo.
+
+\begin{figure}[H]
+\centering
+\label{ej4_modelo}
+\includegraphics[scale=0.4]{./graficos/ej4/modelo.png}
+\caption{Ejemplo del modelado del problema}
+\end{figure}
+
+\subsection{Solución}
+
+El problema pide que se encuentren los dos planes de conexión mas baratos para las ciudades y conexiones ingresadas entre las mismas. Un plan de conexión, como se explicó anteriormente, es uno que une todas las escuelas con una conexión de energía confiable. Donde dicha conexión puede obtenerse directamente desde 'Future' o através de alguna otra escuela que tenga una conexión confiable. Como el costo de un plan de conexión resulta ser la suma de los costos de conexión entre cada una de las ciudades, esto se mapea a nuestro modelo del problema de siguiente forma, el de encontrar hallar el plan de conexión más barato entre los nodos del grafo, es decir, aquel cuya suma de conexiones entre todo par de nodos sea la mínima.
+
+Tomando esto en cuenta, y concentrándonos en el modelo, lo que se debe hallar es el árbol generador mínimo de nuestro grafo que representa el problema. De esta forma es claro que una vez obtenido esto, obtenemos el plan de conexión mínimo buscado.
+
+Para la segunda parte del problema, en donde se tiene que hallar el segundo plan de conexión mínimo, no sirve buscar el árbol generador mínimo. Para hallar el segundo plan, se utiliza como base el árbol obtenido para el primer plan. Como en dicho árbol es muy posible que no se encuentren todas las aristas del grafo original (es decir que, hayan aristas que quedaron fuera del árbol) lo que se puede hacer es ir utilizando las misas de a una, de la siguiente forma: Como al agregar una arista que se encuentra fuera de nuestro árbol generador mínimo, se genera un ciclo, podemos entonces quitar una de las aristas del ciclo (que no sea la que agregamos) para volver a obtener un árbol. Notar entonces que dicho árbol es distinto al del paso 1, donde se puede calcular su costo total, pero no necesariamente dicho costo es mayor al del paso 1. De esta forma, entonces, se pude ir agregando una arista que haya quedado fuera del árbol generador mínimo, e ir calculando el costo de los árboles que se generan al sacar cada una de las aristas que se encuentren dentro del ciclo generado y quedarnos con el de mínimo costo. Este procedimiento lo podemos realizar partiendo desde el árbol generador mínimo, para cada una de las aristas que quedaron fuera del mismo, y calcular de esta forma el segundo plan buscado.
+
+Como comentario adicional podemos aclarar que, si bien cada vez que se agrega una arista al árbol generador mínimo, ir sacando una arista del ciclo que se genera y ver si el costo del árbol resultante es menor y guardarlo funciona, podemos ver que se realizan operaciones de más, ya que el árbol de menor costo entre los generados, es aquel que se obtiene de sacar la arista de mayor costo dentro del ciclo que se generó. Entonces no es necesario y probando de sacar cada una de las aristas en un ciclo, sino que es conveniente, saber cual es la de mayor costo, quitarla y calcular el costo del arbol obtenido.
+
+\subsection{Detalles de implementación}
+
+Para obtener la solución al problema se utilizó el algoritmo de kruskal para el primer resultado, que obtiene el árbol generador mínimo de un grafo. Y luego se utilizó el algoritmo de bfs para poder tener el valor de la arista de mayor costo entre 2 pares de nodos del grafo.
+
+Para poder aplicar estos algoritmos tenemos que pedir que el grafo obtenido sea conexo, de caso contrario no es posible obtener un árbol generador mínimo.
+
+Se disponen de dos implementaciones del grafo que representa las escuelas y sus conexiones. Una de ellas es una lista de ejes, donde se tienen las dos escuelas que une esa conexión y el costo de la misma. Esta implementación, se utiliza para aplicar el algoritmo de kruskal, primeramente ordenando dichos ejes por sus costos de menor a mayor. Con esto se van tomando los ejes desde el de menor costo hasta el mayor, e ir agregándolos de forma tal de no formar ciclos. Para realizar esto, se utiliza la estructura de tipo unionFind que se utilizó para resolver el problema( \href{http://www.daniweb.com/forums/thread54253.html}{referencia} ). Dicha estructura provee implementación para generar conjuntos, unirlos y verificar si dos elementos se encuentran en un mismo conjunto. Con dicha estructura, primeramente se generan tantos conjuntos como nodos hayan y donde cada conjunto contiene un nodo. Cuando se recorren las aristas de menor a mayor costo, se verifica que los extremos de dicha arista no se encuentren en el mismo conjunto, ya que si esto pasa, quiere decir que ya se han unido por alguna otra arista de menor costo, y por lo tanto si se agrega, se generará un ciclo. Si, dichos extremos se encuentran en diferentes conjuntos, entonces se procede a unir los mismos y se acumula el peso de la arista que permitió dicha unión. De esta forma, se pueden ir agregando las aristas correspondientes verificando que no se generen ciclos. Como resultado de esto, obtenemos el costo del árbol generador mínimo buscado.
+
+Para obtener el segundo menor plan, se utilizó la segunda implementación del grafo del problema, que consiste en tener para cada uno de los nodos, la lista de los adyacentes a el, con sus costo correspondiente. Lo que se hace, es realizar un bfs para cada uno de los nodos del grafo correspondiente al árbol generador mínimo, y guardar para cada par de nodos u y v, la arista con mayor costo entre el camino que va entre ellos. Esto se hace para saber cual es el valor de la arista de mayor costo entre cada par de nodos, y con esto quitar la misma para obtener el nuevo árbol y calcular su costo, cuando se agrega una de las aristas que quedaron fuera del árbol generador mínimo.
+
+Con esto, se van calculando los costos de los árboles obtenidos, y se queda con aquel que tiene menor costo, y ese es el segundo menor plan.
+
+
+\subsection{Cálculo de complejidad}
+
+Primeramente, la estructura de unionFind obtenida, utiliza path compression y Wighting que mantiene la estructura óptima y reduce la complejidad de la implementación a $O ( (N + M)*log(N))$, donde $N$ es la cantidad de elementos dentro de los conjuntos y $M$ es la cantidad de uniones que se realizaron. Y esto en si, lo podemos expresar como $O(N)$, ya que $M$ (la cantidad de veces que se unieron conjuntos) es a lo sumo N.( \href{http://www.cs.princeton.edu/~rs/AlgsDS07/01UnionFind.pdf}{referencia} )
+
+Como parámetros de entrada del problema, tomamos la cantidad de escuelas ($N$) y la cantidad de conexiones entre estas ($M$), que se mapean a cantidad de nodos y aristas respectivamente en nuestro modelo.
+
+Para obtener el primer plan, utilizamos kruskal, recorriendo las aristas de mayor a menor (ordenarlas cuesta $O(M*log M)$ ), y por cada una de estas, verificamos si los nodos que unen se encuentran en el mismo conjunto, si es así se sigue, y si no se realiza la unión de los conjuntos donde se encuentran cada uno. Verificar y unir, como vimos anteriormente cuesta $O(N)$, ya que usando la estructura unionFind, la cantidad de elementos dentro de los conjuntos es igual a la cantidad de nodos ($N$). Luego con esto obtenemos una complejidad de $O (M*N) \le O(N^3)$.
+
+Para obtener el segundo plan, realizamos bfs para cada nodo del árbol generador mínimo. Cada corrida de bfs cuesta $O(N + (N - 1))$ y esto lo hacemos por cada nodo, entonces obtenemos una complejidad de $O( N*( N + (N-1) ) )$, que se puede expresar como $O(N^2)$.
+
+Una vez obtenidos los ejes de mayor costo entre todo par de nodos en el árbol generador mínimo se recorren los ejes que quedaron fuera del mismo se agregan y se quita el eje correspondiente al mayor costo entre los nodos que generan el ciclo, luego se calcula el valor del costo del árbol obtenido (que son cuentas de costo constante). Entonces, recorrer todas las aristas que quedaron afuera y calcular el costo de los árboles, quedándose con el de menor costo cuesta $O(M)$ en peor caso.
+
+Luego podemos concluir que el costo, del algoritmo que llega a la solución pedida tiene costo de $O( N^3 + N^2 + M)$ $\le$ $O(N^3)$.
