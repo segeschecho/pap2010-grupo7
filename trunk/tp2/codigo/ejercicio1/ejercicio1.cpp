@@ -1,4 +1,4 @@
-//#define FILEINPUT
+#define FILEINPUT
 
 #include <iostream>
 #include <vector>
@@ -45,11 +45,11 @@ public:
         uint filas = hayPared.size();
         uint columnas = hayPared[ 0 ].size();
 
-        Vvvvpuiui visite( filas, Vvvpuiui( columnas, Vvpuiui( filas, Vpuiui( columnas, Puiui(INFINITO, INFINITO) ) ) ) );
+        Vvvvpuiui mejorMarca( filas, Vvvpuiui( columnas, Vvpuiui( filas, Vpuiui( columnas, Puiui(INFINITO, INFINITO) ) ) ) );
         vector< Nodo > cola;
 
         cola.push_back( Nodo(mCasInicialCaja, mCasInicial) );
-        visite[ mCasInicialCaja.first ][ mCasInicialCaja.second ][ mCasInicial.first ][ mCasInicial.second ] = Puiui( 0, 0 );
+        mejorMarca[ mCasInicialCaja.first ][ mCasInicialCaja.second ][ mCasInicial.first ][ mCasInicial.second ] = Puiui( 0, 0 );
 
         uint numNodoActual = 0;
         uint empujonesMejorSol = INFINITO;
@@ -73,15 +73,15 @@ public:
                 for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
                 {
                     Nodo nuevoNodo = adyacente( nodoActual, d );
-                    uint menorCantPasos = visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].first;
-                    uint menorCantEmpujones = visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].second;
+                    uint menorCantPasos = mejorMarca[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].first;
+                    uint menorCantEmpujones = mejorMarca[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ].second;
 
                     if( !hayPared[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ] && !hayPared[ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] && \
                         ( nuevoNodo.e < menorCantEmpujones || ( nuevoNodo.e == menorCantEmpujones && nuevoNodo.p < menorCantPasos ) ) && \
                         ( nuevoNodo.e < empujonesMejorSol || ( nuevoNodo.e == empujonesMejorSol && nuevoNodo.p < pasosMejorSol ) ) )
                     {
                         cola.push_back( nuevoNodo );
-                        visite[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = Puiui( nuevoNodo.p, nuevoNodo.e );
+                        mejorMarca[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = Puiui( nuevoNodo.p, nuevoNodo.e );
                     }
                 }
             }
@@ -95,49 +95,6 @@ public:
         }
         return pair< int, int >( pasosMejorSol, empujonesMejorSol );
     }
-/*
-
-    int moverme( Casillero ci, Casillero cf, Casillero casCaja )
-    {
-        if( hayPared[ cf.first ][ cf.second] )
-        {
-            return -1;
-        }
-
-        uint filas = hayPared.size();
-        uint columnas = hayPared[ 0 ].size();
-
-        Vvpuiui visite( Vvpuiui( filas, Vpuiui( columnas, false ) ) );
-        vector< pair< Casillero, uint > > cola;
-
-        cola.push_back( pair< Casillero, uint >( ci, 0 ) );
-        visite[ cola[ 0 ].first.first ][ cola[ 0 ].first.second ] = true;
-        uint i = 0;
-
-        // mientras que aun me pueda mover y no estoy en el destino
-        while( i < cola.size() && cola[ i ].first != cf )
-        {
-            for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
-            {
-                Casillero nuevoCasillero = casilleroVecino( cola[ i ].first, d );
-                if( !hayPared[ nuevoCasillero.first ][ nuevoCasillero.second ] && nuevoCasillero != casCaja && 
-                    !visite[ nuevoCasillero.first ][ nuevoCasillero.second ] )
-                {
-                    cola.push_back( pair< Casillero, uint >( nuevoCasillero, cola[ i ].second + 1 ) );
-                    visite[ nuevoCasillero.first ][ nuevoCasillero.second ] = true;
-                }
-            }
-
-            i++;
-        }
-
-        if( i == cola.size() )
-        {
-            return -1;
-        }
-        return cola[ i ].second;
-    }
-*/
 
     Casillero casilleroVecino( Casillero c, Direccion d )
     {
@@ -280,8 +237,8 @@ int main()
 {
 #ifdef FILEINPUT
 
-    ifstream entrada( "testImpossivel", ios_base::in );
-    ofstream salida( "testImpossivelOut", ios_base::out );
+    ifstream entrada( "test", ios_base::in );
+    ofstream salida( "testOut", ios_base::out );
 #else
     istream& entrada = cin;
     ostream& salida = cout;

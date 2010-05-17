@@ -43,7 +43,7 @@ Este algoritmo efectivamente resuelve el problema, dado que por lo visto en clas
 
 Implementamos una clase \textbf{Red} que sería el grafo con ejes con costo y flujo. Dado el problema y nuestra solución concluimos que todos los ejes tienen la misma capacidad, por lo tanto Red mantiene una variable para la capacidad de todos los ejes del grafo. Un eje está compuesto de un nodo fuente y otro destino. Para los costos y flujos se mantienen dos matrices para poder consultar y asignar el costo y flujo de un eje en tiempo constante. Se mantiene además una lista de adyacencias.
 
-Se implementó una clase \textbf{ULLInt} (Unsigned Long Long Int) que representa los enteros y el valor infinito. Esto lo hicimos para poder inicializar las distancias a los demás nodos a infinito en el algoritmo de Bellman-Ford. Esta clase tiene implementados los operadores de suma y comparación por mayor, de forma que $infinito > entero$ resulta verdadero, pero $infinito > infinito$ no.
+Se implementó una clase \textbf{ULLInt} (Unsigned Long Long Int) que representa los enteros y el valor infinito. Esto lo hicimos para poder inicializar las distancias a los demás nodos a infinito en el algoritmo de Bellman-Ford. Esta clase tiene implementados los operadores de suma y comparación por mayor, de forma que $\infty > entero$ resulta verdadero, pero $\infty > \infty$ no.
 
 Se implementó una clase \textbf{TestCase} que es la más importante, pues es la responsable de resolver el problema. Contiene la implementación de Ford-Fulkerson (resolver) y Bellman-Ford (buscarCaminoMinimo).
 
