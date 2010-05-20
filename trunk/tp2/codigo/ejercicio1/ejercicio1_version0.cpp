@@ -1,4 +1,5 @@
 #define FILEINPUT
+#define TESTPERFORMANCE
 
 #include <iostream>
 #include <vector>
@@ -14,6 +15,12 @@ typedef vector< Puiui > Vpuiui;
 typedef vector< Vpuiui > Vvpuiui;
 typedef vector< Vvpuiui > Vvvpuiui;
 typedef vector< Vvvpuiui > Vvvvpuiui;
+
+#ifdef TESTPERFORMANCE
+#include <windows.h>
+uint nodosAnalizados;
+DWORD alocacionDeMatrices;
+#endif
 
 #define INFINITO 0xFFFFFFFF
 
@@ -42,10 +49,20 @@ public:
 
     pair< int, int > resolver()
     {
+#ifdef TESTPERFORMANCE
+        nodosAnalizados = 0;
+        alocacionDeMatrices = 0;
+#endif
         uint filas = hayPared.size();
         uint columnas = hayPared[ 0 ].size();
 
+#ifdef TESTPERFORMANCE
+        DWORD inicio = GetTickCount();
+#endif
         Vvvvpuiui mejorMarca( filas, Vvvpuiui( columnas, Vvpuiui( filas, Vpuiui( columnas, Puiui(INFINITO, INFINITO) ) ) ) );
+#ifdef TESTPERFORMANCE
+        alocacionDeMatrices = GetTickCount() - inicio;
+#endif
         vector< Nodo > cola;
 
         cola.push_back( Nodo(mCasInicialCaja, mCasInicial) );
@@ -80,6 +97,9 @@ public:
                         ( nuevoNodo.e < menorCantEmpujones || ( nuevoNodo.e == menorCantEmpujones && nuevoNodo.p < menorCantPasos ) ) && \
                         ( nuevoNodo.e < empujonesMejorSol || ( nuevoNodo.e == empujonesMejorSol && nuevoNodo.p < pasosMejorSol ) ) )
                     {
+#ifdef TESTPERFORMANCE
+                        nodosAnalizados++;
+#endif
                         cola.push_back( nuevoNodo );
                         mejorMarca[ nuevoNodo.pC.first ][ nuevoNodo.pC.second ][ nuevoNodo.pK.first ][ nuevoNodo.pK.second ] = Puiui( nuevoNodo.p, nuevoNodo.e );
                     }
@@ -238,16 +258,17 @@ int main()
 #ifdef FILEINPUT
 
     ifstream entrada( "test", ios_base::in );
-    ofstream salida( "testOut", ios_base::out );
 #else
     istream& entrada = cin;
-    ostream& salida = cout;
 #endif
 
     int numTest = 1;
     bool testValido = true;
     while( testValido )
     {
+#ifdef TESTPERFORMANCE
+        DWORD inicio = GetTickCount();
+#endif
         TestCase testActual;
         entrada >> testActual;
         testValido = testActual.valido();
@@ -255,19 +276,24 @@ int main()
         {
             pair< int, int > res = testActual.resolver();
 
-            salida << "Instancia " << numTest << endl;
+            cout << "Instancia " << numTest << endl;
             if( res.first >= 0 )
-                salida << res.first << " " << res.second << endl;
+                cout << res.first << " " << res.second << endl;
             else
-                salida << "Impossivel" << endl;
+                cout << "Impossivel" << endl;
 
-            salida << endl;
+#ifdef TESTPERFORMANCE
+            cout << GetTickCount() - inicio - alocacionDeMatrices << " ticks para la solucion" << endl;
+            cout << alocacionDeMatrices << " ticks para alocacion de matrices" << endl;
+            cout << nodosAnalizados << " nodos analizados" << endl;
+#endif
+            cout << endl;
 
             numTest++;
         }
     }
 #ifdef FILEINPUT
-    salida.close();
     entrada.close();
+    system("PAUSE");
 #endif
 }
