@@ -152,8 +152,8 @@ bool compararParFeo(const parFeo& p1, const parFeo& p2){
 
 //para sort, ordema por horaSalida
 bool compararParFeoHSalida(const parFeo& p1, const parFeo& p2){
-    horaReloj h1 = p1.second.first;
-    horaReloj h2 = p2.second.first;
+    horaReloj h1 = p1.first.first;
+    horaReloj h2 = p2.first.first;
 
     return (h1 < h2);
 }
@@ -243,7 +243,7 @@ class TestCase{
 
                 //actualizo el horario
                 horario = hora;
-                //cout << "sale: " << hora;
+                // << "sale: " << hora;
                 //cout << " horario: " << horario;
 
                 is >> ciudad;
@@ -339,7 +339,7 @@ class TestCase{
         t.destino = t.ciudadNodo[destino];
 
         //muestro para ver que anda
-/*        for (int i = 0; i < numeroNodo; i++){
+ /*       for (int i = 0; i < numeroNodo; i++){
             //muestro los adyacentes
             cout << "adyacentes de: " << i;
             for (int j = 0; j < t.listaAdy[i].size(); j++){
@@ -375,10 +375,10 @@ public:
         int adyacentesOrigen = listaAdy[origen].size();
 
         //marcamos el origen como recorrido
-        tiempos[origen].second = true;
+//        tiempos[origen].second = true;
 
         //esto por si hay algun caso raro
-        if(destino == origen){
+/*        if(destino == origen){
             horaReloj min = listaAdy[origen][0].horarioSalida();
 
             if(adyacentesOrigen > 0){
@@ -395,7 +395,7 @@ public:
             }
             return;
         }
-
+*/
         for(int adyOrigen = 0; adyOrigen < adyacentesOrigen; adyOrigen++){
             vector <int> tocados;
             //nodo con el que comienzo dijktra
@@ -420,7 +420,7 @@ public:
 
             //marco el nodo como tocado
             tocados.push_back(nodoActual);
-
+cout << "corrida" << endl;
             while(hayMas){
                 for(int adyActual = 0; adyActual < adyacentesActual; adyActual++){
                     Eje ejeAdyActual = listaAdy[nodoActual][adyActual];
@@ -431,12 +431,19 @@ public:
                         horaReloj dif;
 
                         diferencia(horariosLlegada[nodoActual], ejeAdyActual.horarioSalida(), dif);
+                        cout << " dif1 " << dif;
                         dif += ejeAdyActual.tiempoViaje();
                         dif += tiempos[nodoActual].first;
+
+                        cout << " horario llegada; " << horariosLlegada[nodoActual];
+                        cout << " horario salida: " << ejeAdyActual.horarioSalida();
+                        cout << " dif2 " << dif << endl;
 
                         if(dif < tiempos[nodoAdy].first){
                             //si es menor el tiempo para llegar, entonces actualizo
                             tiempos[nodoAdy].first = dif;
+
+                            cout << "asigno tiempos[" << nodoAdy << "] : " << dif << endl;
 
                             horariosLlegada[nodoAdy] = ejeAdyActual.horarioSalida();
 
@@ -490,13 +497,18 @@ public:
 */
         horaReloj llegadaMinDiaSig;
         horaReloj hora24(24,0);
-
         llegadaMinDiaSig = resultados[0].first.first;
         llegadaMinDiaSig += resultados[0].second.first;
         llegadaMinDiaSig += hora24;
 
         //recorro los tiempos y saco los que se pasan de llegadaMinDiaSig
+        cout << "resultados: salida " << resultados[0].first.first;
+        cout << " llegada " << resultados[0].first.second;
+        cout << " viaje " << resultados[0].second.first << endl;
         for(int i = 1; i < resultados.size(); i++){
+            cout << "resultados: salida " << resultados[i].first.first;
+            cout << " llegada " << resultados[i].first.second;
+            cout << " viaje " << resultados[i].second.first << endl;
             horaReloj temp;
             temp = resultados[i].first.first;
             temp += resultados[i].second.first;
@@ -556,12 +568,12 @@ public:
             }
         }
 
-        //ordeno los resultados por horario de salida + tiempo viaje
+        //ordeno los resultados por horario de salida
         sort(resultados.begin(), resultados.end(), compararParFeoHSalida);
 
         //muestro los resultados
         //cout << endl;
-       for (int i = 0; i < resultados.size(); i++){
+        for (int i = 0; i < resultados.size(); i++){
             if(resultados[i].second.second){
                 mostrarHorario(cout, resultados[i].first.first);
                 cout << " " << resultados[i].second.first << endl;
@@ -656,10 +668,8 @@ int main()
     while (cantCasos > 0){
         TestCase test;
 
-        //cout << "cargando test" << endl;
         cin >> test;
 
-        //viene resolver
         test.resolver();
         if(cantCasos != 1)
             cout << endl;
