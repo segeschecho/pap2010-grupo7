@@ -25,14 +25,14 @@ using namespace std;
 /*
  * Definiciones de funciones auxiliares
  */
-void obtenerHora(istream& is, horaReloj& hora);
-void sumarConLimite(horaReloj& h1, horaReloj& h2);
-void sumarSinLimite(horaReloj& h1, horaReloj& h2);
-void mostrarTiempoViaje(ostream& os, horaReloj& h);
-void mostrarHora(ostream& os, horaReloj& h);
-void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res);
-void restarHora(horaReloj& h1, horaReloj& h2, horaReloj& res);
-bool compararDatosNodo(datosNodo &d1, datosNodo& d2);
+inline void obtenerHora(istream& is, horaReloj& hora);
+inline void sumarConLimite(horaReloj& h1, horaReloj& h2);
+inline void sumarSinLimite(horaReloj& h1, horaReloj& h2);
+inline void mostrarTiempoViaje(ostream& os, horaReloj& h);
+inline void mostrarHora(ostream& os, horaReloj& h);
+inline void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res);
+inline void restarHora(horaReloj& h1, horaReloj& h2, horaReloj& res);
+inline bool compararDatosNodo(datosNodo &d1, datosNodo& d2);
 
 
 
@@ -215,7 +215,7 @@ public:
             filtrarResultados(resultadosFiltrados);
 
             ///muestro resultados
-            for(int i = 0; i < resultadosFiltrados.size(); i++){
+            for(int i = resultadosFiltrados.size() - 1; i >= 0 ; i--){
                 mostrarHora(cout, resultadosFiltrados[i].first);
                 cout << " ";
                 mostrarTiempoViaje(cout, resultadosFiltrados[i].second);
@@ -239,7 +239,7 @@ private:
      *  Metodos
      */
 
-    bool estaCiudad(string ciudad){
+    inline bool estaCiudad(string ciudad){
         map<string ,int> :: iterator it;
 
         it = ciudadANodo.find(ciudad);
@@ -250,7 +250,7 @@ private:
         }
     }
 
-    int buscarProximoNodo(){
+    inline int buscarProximoNodo(){
         horaReloj min = INF;
         int nodoRes = -1;
 
@@ -263,7 +263,7 @@ private:
         return nodoRes;
     }
 
-    void filtrarResultados(vector < salidaYViaje >& res){
+    inline void filtrarResultados(vector < salidaYViaje >& res){
         horaReloj minLlegadaDiaSig = INF;
         vector < salidaYViaje > tempRes;
 
@@ -301,7 +301,6 @@ private:
                 res.push_back(tempRes[i]);
             }
         }
-        sort(res.begin(), res.end());
     }
 
 };
@@ -332,7 +331,7 @@ int main(){
  */
 
 //toma la hora y la covierte en horaReloj
-void obtenerHora(istream& is, horaReloj& hora){
+inline void obtenerHora(istream& is, horaReloj& hora){
     string horaString;
 
     //obtengo la hora del trayecto
@@ -345,7 +344,7 @@ void obtenerHora(istream& is, horaReloj& hora){
 }
 
 //suma horas, pero manteniendose en el rango usual
-void sumarConLimite(horaReloj& h1, horaReloj& h2){
+inline void sumarConLimite(horaReloj& h1, horaReloj& h2){
     //sumo los minutos
     h1.second += h2.second;
     //me fijo si se paso de 60
@@ -365,7 +364,7 @@ void sumarConLimite(horaReloj& h1, horaReloj& h2){
 }
 
 //suma horas, pero no hace modulo 24hs
-void sumarSinLimite(horaReloj& h1, horaReloj& h2){
+inline void sumarSinLimite(horaReloj& h1, horaReloj& h2){
     //sumo los minutos
     h1.second += h2.second;
     //me fijo si se paso de 60
@@ -380,7 +379,7 @@ void sumarSinLimite(horaReloj& h1, horaReloj& h2){
 }
 
 // muestra la hora de la forma hhh...h:mm
-void mostrarTiempoViaje(ostream& os, horaReloj& h){
+inline void mostrarTiempoViaje(ostream& os, horaReloj& h){
 
     os << h.first << ":";
     if(h.second < 10)
@@ -390,7 +389,7 @@ void mostrarTiempoViaje(ostream& os, horaReloj& h){
 }
 
 //muestra la hora de la forma hh:mm
-void mostrarHora(ostream& os, horaReloj& h){
+inline void mostrarHora(ostream& os, horaReloj& h){
     if(h.first < 10)
         os << "0" << h.first;
     else
@@ -405,7 +404,7 @@ void mostrarHora(ostream& os, horaReloj& h){
 }
 
 //calcula la diferencia entre 2 horas mod 24
-void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res){
+inline void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res){
 
     if(h1 == h2){
         res = horaReloj(0,0);
@@ -426,7 +425,7 @@ void diferencia (horaReloj& h1, horaReloj& h2, horaReloj &res){
 }
 
 //resta horas suponiendo h1 mas grande que h2
-void restarHora(horaReloj& h1, horaReloj& h2, horaReloj& res){
+inline void restarHora(horaReloj& h1, horaReloj& h2, horaReloj& res){
     int minutos = 0;
     int horas = 0;
 
@@ -441,6 +440,6 @@ void restarHora(horaReloj& h1, horaReloj& h2, horaReloj& res){
     res = horaReloj(horas, minutos);
 }
 
-bool compararDatosNodo(const salidaYViaje &d1, const salidaYViaje& d2){
+inline bool compararDatosNodo(const salidaYViaje &d1, const salidaYViaje& d2){
     return (d1.first < d2.first);
 }
