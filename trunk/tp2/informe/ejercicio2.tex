@@ -35,8 +35,103 @@ Los horarios de salida deben ser dados como $hh:mm$ (es decir exactamente 2 dígi
 
 \subsection{Modelo}
 
+Para resolver el problema, se pensó en un modelo que utiliza grafos. Y consiste en lo siguiente: Cada una de las ciudades es representada por un nodo. Como de cada una de ellas se puede viajar o no a otra, los ejes representan una conexión entre cada una de las ciudades. Además, como la conexión, puede ser de una ciudad a otra, pero no viceversa, los ejes utilizados tienen dirección (origen-destino). Hasta ahora se tiene entonces, un digrafo, donde las ciudades son representadas por nodos, y los ejes con dirección representan la posibilidad de ir de una ciudad a otra por alguna de las líneas definidas. Como cada tramo entre dos ciudades consume tiempo de viaje, cada uno de los ejes dentro de nuestro modelo, tendrán asociados estos valores, de esta forma obtenemos un digrafo con pesos es sus ejes. Hace falta representar mas información además de la mencionada, una de ellas es que cada tramo que tiene un tiempo de viaje entre una ciudad y otra, tiene que tener asociado un horario de salida desde la ciudad de salida, para poder saber a que hora se arribará a la ciudad de llegada. Por esta razón, cada uno de los ejes tendrá un horario de salida.
+
+Una cuestión a tener en cuenta, es que viajando por un tren, podemos arribar a una estación, y hacer combinación o no con otras líneas que pasen por dicha ciudad. Entonces, no importa a que hora arribemos a la ciudad, vamos a tener que esperar o no (dependiendo del horario de salida de cada uno de los trenes que salen de la estación) para hacer la combinación que queremos. De esta forma, dentro de una misma ciudad podemos tener tiempos de espera, que dependen de la hora en que se arribe a la estación. Esto lo podemos ver también como tiempo de viaje, ya que a la hora de saber cuanto se tardó de una ciudad a otra viajando, este tiempo de espera tendrá que ser sumado. De esta forma, al modelo planteado, se le tendrá que agregar esta característica del problema, y la forma de agregar esta información representando las ciudades de otra forma, no solo con un nodo como se explicó al principio, si no que ahora, cada ciudad consta de un grupo de nodos, que representan cada una de las líneas que arriban a ella, y donde cada uno de estos nodos, están conectados entre si, con su correspondiente tiempo de espera entre la hora en que se llegó a la ciudad por esa línea y la hora de salida de cada una de las líneas que salen de la misma.
+
+Con este modelo entonces, podemos calcular el tiempo de viaje entre dos ciudades, que es una de las cosas que se tendrá que hacer para resolver el problema.
+
+A modo de ejemplo, supongamos que se tiene la siguiente entrada:
+
+\begin{itemize}
+\item 1
+\item 4
+\item 3 08:00 A 1:55 B 1:00 C
+\item 2 10:00 B 0:30 C
+\item 2 09:00 D 1:00 B
+\item 2 06:00 D 0:25 C
+\item D C
+\end{itemize}
+
+El anterior ejemplo se puede ver como sigue, donde en las ciudades del lado izquierdo se tienen los horarios de llegada por las diferentes líneas, y en la parte derecha, los horarios de salida, mientras que los valores en cada conexión, representan el tiempo de viaje requerido para ir entre las ciudades.
+
+\begin{figure}[H]
+\centering
+\label{ej2_modelo}
+\includegraphics[scale=0.4]{./graficos/ej2/ejemplo.png}
+\caption{Ejemplo de problema}
+\end{figure}
+
+Este ejemplo es modelado de la siguiente forma:
+
+\begin{figure}[H]
+\centering
+\label{ej2_modelo2}
+\includegraphics[scale=0.4]{./graficos/ej2/ejemploGrafo.png}
+\caption{Ejemplo del modelado del problema}
+\end{figure}
+
+Donde se puede observar que cada ciudad contiene un conjunto de nodos que representan los horarios de llegada a la ciudad desde cada línea. Además, se pueden observar los tiempos de espera para realizar las combinaciones. Cabe aclarar, que este modelo no se encuentra completo ya que hacen falta los ejes que representan los tiempos de espera en las ciudades D y C, que tendrían que ir, pero para simplificar el ejemplo no se agregaron, además resulta evidente que no es necesario saber los tiempos de espera para ciudades en las que solo terminan líneas o en las que solo son comienzos de líneas (como es el caso de D y C) ya que no aportan ningún tipo de información adicional. De todas formas dichos vértices deben ir.
+
 \subsection{Solución}
+
+Teniendo el modelo representado, hallar la solución consta de los ciertos pasos. Como se debe hallar el cronograma de viajes entre una ciudad origen $O$ y otra destino $D$. Lo que se hace es, calcular el mínimo tiempo de viaje entre $O$ y $D$ yendo por cada una de las líneas que salen de $O$.
+
+Calcular el mínimo tiempo de viaje entre $O$ y $D$ yendo por cada una de las líneas cada vez, se puede interpretar como encontrar el camino mínimo entre $O$ y $D$ yendo por cada una de las  líneas salientes de $O$, ya que los tiempos de viaje en cada una de las aristas del grafo del problema se pueden ver como los pesos de las mismas. Por lo tanto, el problema de encontrar el cronograma entre $O$ y $D$ se convierte en el problema de buscar los caminos mínimos entre $O$ y $D$. Teniendo esto en cuenta, la solución se puede hallar utilizando el algoritmo de $Dijkstra$, ya que nuestro modelo resulta en un digrafo sin ciclos negativos.
+
+De esta forma, tendremos que correr el algoritmo de $Dijkstra$ tantas veces como líneas salgan de $O$ para obtener el cronograma tentativo que contendrá los pares $<$hora de salida, tiempo de viaje$>$.
+
+Una vez obtenido el cronograma tentativo, lo que se debe hacer es filtrar algunos de los resultados, para cumplir las condiciones mencionadas en el enunciado del problema:
+
+\begin{itemize}
+\item A: No hay otra conexión que pueda dejarte salir mas tarde y llegar a la misma hora o mas temprano.
+\item B: No hay otra conexión que saliendo al a misma hora llegue mas temprano o a la misma hora de llegada.
+\end{itemize}
+
+Para realizar esto, se ve cada par $<$hora de salida, tiempo de viaje$>$ como un intervalo, y se quitan aquellos que tienen alguno contenido (ya que el que se encuentra contenido, cumple ambas condiciones $A$ y $B$), pero se explicará mas adelante cuando se muestre el algoritmo que realiza el filtrado.
 
 \subsection{Detalles de implementación}
 
+El modelo mencionado, se implementó de forma algo distinta a lo que se mostró, en una versión 'comprimida' del modelo. En este caso, como cada ciudad puede contener como ya vimos varios nodos, a la hora de implementar esto, no es necesario hacerlo de forma tan estricta, por esta razón, en la implementación del modelo, cada ciudad tendrá sus adyacentes por cada una de las líneas que pasan por ella, pero, las transiciones internas a cada ciudad se no se representarán con nodos y transiciones, sino que dependiendo de la hora en que se llegue, se realizará el calculo del tiempo de espera para cada uno de líneas que salen de dicha ciudad, tomando como referencia el horario de salida de cada una.
+
+De esta forma, una ciudad, tiene asociada una lista de adyacencias con los atributos $<$ hora de salida, tiempo de viaje, siguiente ciudad $>$. Con esta información, desde una ciudad, se puede llegar a otra, sabiendo el tiempo que cuesta llegar y además la hora de llegada del mismo (sumando la hora de salida con el tiempo de viaje). Sabiendo la hora de llegada a la siguiente ciudad tomando alguna de las líneas, se puede luego calcular el tiempo de espera para alguna combinación, ya que en la siguiente ciudad se tiene nuevamente una lista de adyacentes con los atributos mencionados anteriormente, y tomando la hora de salida, se puede junto con la hora de llegada a dicha ciudad, calcular el tiempo de espera. Como se puede observar, esto representa lo mismo que el modelo mencionado en la anterior sección.
+
+Los resultados de calcular el minimo camino entre $O$ y $D$ tienen la forma $<$ hora de salida, mínimo tiempo de viaje $>$ para cada una de las lineas de salida de $O$. Es importante tener la hora de salida en este caso, por que luego a la hora de filtrar los resultados dejando solo aquellos que cumplen las condiciones $A$ y $B$, este valor es el que representará el inicio del intervalo relacionado con cada uno de los pares resultado (y el final será claramente, horario de salida + mínimo tiempo de viaje). El algoritmo para realizar esto es el siguiente:
+
+\begin{algorithm}[H]
+\caption{filtrarResultados}
+\begin{algorithmic}[1]
+\PARAMS{resultados}
+\STATE Ordenar los resultados por horario de salida y tiempo de viaje
+\FOR{cada resultado R en resultados}
+	\STATE Quitar R si R tiene la misma hora de salida que el resultado anterior
+\ENDFOR
+\STATE \COMMENT{buscar el resultado que minimize hora salida + viaje + 24hs}
+\STATE definir minLlegadaDiaSig = INF
+\FOR{cada resultado R}
+	\STATE calcular llegada = R.horarioSalida + R.viaje + 24hs.
+	\IF{llegada $<$ minLlegadaDiaSig}
+		\STATE minLlegadaDiaSig = llegada
+	\ENDIF
+\ENDFOR
+\STATE \COMMENT{quitar los resultados que tienen alguno contenido}
+\FOR{cada resultado R}
+	\STATE llegada = r.horarioSalida + R.viaje
+	\IF{llegada $>$ minLlegadaDiaSig}
+		\STATE quitar R de los resultados
+	\ENDIF
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+Se puede observar que el parámetro "`resultados"' tiene tantos elementos como líneas salen de $O$, al ordenarse por horario de salida y tiempo de viaje (es decir, si hay resultados cuya hora de salida se la misma, entonces se ordena tiempo de viaje), lo que se obtiene con esto es (además de ordenar) agrupar aquellas rutas que tengan el mismo horario de salida, pero que difieran en su tiempo de viaje (que también se encontrarán ordenados de forma creciente por este último valor), por esta razón se puede recorrer "`resultados"' una vez y quitar aquellas rutas que salgan a la misma hora pero lleguen mas tarde (haciendo cumplir la condición $B$), que es lo que hace el primer ciclo de tipo $for$. Luego de esto se busca $minLlegadaDiaSig$, que representa cuan temprano se puede llegar al día siguiente, de esta forma entonces, se busca el resultado que minimice horario de salida $+$ tiempo de viaje $+$ 24hs. Una vez obtenido esto, cualquier resultado que tenga horario salida $+$ tiempo de viaje mayor a $minLlegadaDiaSig$ es un resultado que no cumplirá la condición $A$, ya que habrá algún resultado, que permita salir al menos a la misma hora y llegar al mismo tiempo o antes. Teniendo esto en cuenta y aprovechando que los resultados se encuentran ordenados (lo siguen estando a pesar de que se quitaron los que no cumplían la condición $B$), se recorren los mismos de forma decreciente, ya que hay mas posibilidades de que los que tienen horario de salida mayor, puedan pasar $minLlegadaDiaSig$. Ahora si se encuentra un resultado $R$ cuya suma de horario mas tiempo de viaje sea menor a $minLlegadaDiaSig$, el resultado $R$ tiene que ir en la solución final y el valor de $minLlegadaDiaSig$ tiene que actualizarse ya que no hay otro resultado que salga después del horario de salida de $R$ y llegue antes.
+
 \subsection{Cálculo de complejidad}
+
+Sea $E$ el número de ejes y sea $V$ el número de vértices del grafo resultante de representar el problema.
+
+Como se calcula el camino mas corto entre $O$ y $D$ para cada una de las líneas que salen de $O$ utilizando el algoritmo de $Dijkstra$, calcular cada uno de los caminos resulta tener una complejidad de $O(V^2)$ (Complejidad del algoritmo $Dijkstra$). Cada uno de los caminos mínimos entonces, se calcula para cada una de las líneas adyacentes, que puede ser a lo sumo (y acotando superiormente este valor) $E$. Por esta razón, buscar los mínimos caminos entre $O$ y $D$ tiene un costo de $O(E*V^2)$.
+
+Luego de que se obtienen los caminos mínimos, resta filtrarlos y dejar solo aquellos que cumplan las condiciones $A$ y $B$. Se mencionó que "`resultados"' tiene al comienzo, la misma cantidad de elementos que líneas que salgan de $O$, por lo tanto y como se puede observar en el pseudocódigo de filtrarResultados, la operación mas costosa es la de ordenar los resultados por horario de salida y tiempo de viaje, que tiene un costo de $O(E*Log(E))$, y luego los ciclos $for$, que recorren 'resultados' de forma lineal con costo $O(E)$. Podemos entonces decir que la complejidad del filtrado de resultados es $O(E*Log(E))$
+
+Con lo explicado anteriormente se puede llegar a la complejidad final de la solución de $O(E^2 + E*V^2)$.
