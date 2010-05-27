@@ -1,10 +1,8 @@
-//#define FILEINPUT
-//#define TESTPERFORMANCE
-
 #include <iostream>
 #include <vector>
-#include <fstream>
 using namespace std;
+
+//---------------------------------------------------------------------------------------------
 
 #define INFINITO 0xFFFFFFFF
 
@@ -20,13 +18,11 @@ typedef vector< VPuiui > VvPuiui;
 typedef vector< VvPuiui > VvvPuiui;
 typedef vector< VvvPuiui > VvvvPuiui;
 
-#ifdef TESTPERFORMANCE
-#include "windows.h"
-uint nodosAnalizados;
-DWORD alocacionDeMatrices;
-#endif
+//---------------------------------------------------------------------------------------------
 
 inline uint beta ( bool b ) { return b ? 1 : 0; }
+
+//---------------------------------------------------------------------------------------------
 
 class Nodo
 {
@@ -40,11 +36,15 @@ public:
     Casillero pK;
 };
 
+//---------------------------------------------------------------------------------------------
+
 class TestCase
 {
 public:
     TestCase(){};
     ~TestCase(){};
+
+    //---------------------------------------------------------------------------------------------
 
     inline bool valido()
     {
@@ -71,24 +71,18 @@ public:
         return !hayPared( nodo.pC ) && !hayPared( nodo.pK );
     }
 
+    //---------------------------------------------------------------------------------------------
+    // Implementación del BFS para caminos mínimos que resuelve el problema
     Puiui resolver()
     {
-#ifdef TESTPERFORMANCE
-        nodosAnalizados = 0;
-        alocacionDeMatrices = 0;
-#endif
         Puiui mejorSolucion = Puiui( INFINITO, INFINITO );
 
         uint filas = mHayPared.size();
         uint columnas = mHayPared[ 0 ].size();
 
-#ifdef TESTPERFORMANCE
-        DWORD inicio = GetTickCount();
-#endif
+        // Inicializamos la matriz auxiliar para el BFS para caminos mínimos
         mMinDist = VvvvPuiui ( filas, VvvPuiui( columnas, VvPuiui( filas, VPuiui( columnas, Puiui(INFINITO, INFINITO) ) ) ) );
-#ifdef TESTPERFORMANCE
-        alocacionDeMatrices = GetTickCount() - inicio;
-#endif
+
         // Comienzo del BFS
         vector< Nodo > colaCeros;
         vector< Nodo > colaUnos;
@@ -124,8 +118,8 @@ public:
             {
                 mejorSolucion = minDistActual;
             }
-            // Si se esta yendo por un camino peor que la mejor solucion hasta el momento
-            // corto, porque se que no voy a encontrar mejor solucion
+            // Si la caja ya está en el destino no tiene sentido seguir moviendo el personaje, por lo que
+            // si la condición actual dio verdadero no se entra a la parte de expandir el nodo.
             else
             {
                 for( Direccion d = ARRIBA; d <= IZQUIERDA; d = static_cast< Direccion >( d + 1 ) )
@@ -133,9 +127,6 @@ public:
                     Nodo nodoNuevo = adyacente( nodoActual, d );
                     if( esValido( nodoNuevo ) && !marcado( nodoNuevo ) )
                     {
-#ifdef TESTPERFORMANCE
-                        nodosAnalizados++;
-#endif
                         bool empujon = nodoNuevo.pC == nodoActual.pC ? false : true;
                         empujon ? colaUnos.push_back( nodoNuevo ) : colaCeros.push_back( nodoNuevo );
 
@@ -156,6 +147,9 @@ public:
         return mejorSolucion;
     }
 
+    //---------------------------------------------------------------------------------------------
+    // Dado un casillero y una dirección d, casilleroVecino devuelve el 
+    // casillero siguiente en dirección d
     Casillero casilleroVecino( const Casillero& c, const Direccion& d )
     {
         uint fila = c.first, columna = c.second;
@@ -183,6 +177,9 @@ public:
         return Casillero( nuevaFila, nuevaCol );
     }
 
+    //---------------------------------------------------------------------------------------------
+    // Dado un nodo y una dirección d, adyacente devuelve el nodo adyacente resultante de
+    // mover el personaje en dirección d
     Nodo adyacente( const Nodo& n , const Direccion& d )
     {
         Casillero nuevoCasilleroK = casilleroVecino( n.pK, d ), nuevoCasilleroC = n.pC;
@@ -191,6 +188,7 @@ public:
         return Nodo( nuevoCasilleroC, nuevoCasilleroK );
     }
 
+    //---------------------------------------------------------------------------------------------
     // casillero inicial de la caja
     Casillero mCasInicialCaja;
 
@@ -206,8 +204,11 @@ public:
     // auxiliar para hacer el BFS
     VvvvPuiui mMinDist;
 
+    // para saber cuando un TestCase es válido
     bool mValido;
 };
+
+//---------------------------------------------------------------------------------------------
 
 istream& operator>>( istream& is, TestCase& t )
 {
@@ -222,19 +223,10 @@ istream& operator>>( istream& is, TestCase& t )
         }
 
         // ignoro el caracter de '\n' que hay luego del k
-#ifdef FILEINPUT
-        is.ignore();
-#else
         getchar();
-#endif
 
-        // FIXME: ARREGLAR ESTO EN EL MOMENTO DE LA ENTREGA PARA QUE SEA GETCHAR
-#ifdef FILEINPUT
-        char c = is.peek();
-        is.ignore();
-#else
         char c = getchar();
-#endif
+
         // el filas + 2 y columnas + 2 es para agregarle una pared alrededor
         t.mHayPared = vector< vector< bool > > ( filas + 2, vector< bool >( columnas + 2, true ) );
 
@@ -244,14 +236,7 @@ istream& operator>>( istream& is, TestCase& t )
             for( uint col = 1; col < columnas + 1; col++ )
             {
                 if( c == '\n' )
-                {
-#ifdef FILEINPUT
-                    c = is.peek();
-                    is.ignore();
-#else
                     c = getchar();
-#endif
-                }
 
                 switch( c )
                 {
@@ -278,12 +263,7 @@ istream& operator>>( istream& is, TestCase& t )
                     break;
                 };
 
-#ifdef FILEINPUT
-                c = is.peek();
-                is.ignore();
-#else
                 c = getchar();
-#endif
             }
         }
     }
@@ -291,25 +271,16 @@ istream& operator>>( istream& is, TestCase& t )
     return is;
 }
 
+//---------------------------------------------------------------------------------------------
+
 int main()
 {
-#ifdef FILEINPUT
-
-    ifstream entrada( "test", ios_base::in );
-#else
-    istream& entrada = cin;
-#endif
-
     int numTest = 1;
     bool testValido = true;
     while( testValido )
     {
-#ifdef TESTPERFORMANCE
-        DWORD inicio = GetTickCount();
-#endif
-
         TestCase testActual;
-        entrada >> testActual;
+        cin >> testActual;
         testValido = testActual.valido();
         if( testValido )
         {
@@ -320,19 +291,13 @@ int main()
                 cout << res.first << " " << res.second << endl;
             else
                 cout << "Impossivel" << endl;
-#ifdef TESTPERFORMANCE
-            cout << GetTickCount() - inicio - alocacionDeMatrices << " ticks para la solucion" << endl;
-            cout << alocacionDeMatrices << " ticks para alocacion de matrices" << endl;
-            cout << nodosAnalizados << " nodos analizados" << endl;
-#endif
+
             cout << endl;
 
             numTest++;
         }
 
     }
-#ifdef FILEINPUT
-    entrada.close();
-    system("PAUSE");
-#endif
+
+    return 0;
 }
